@@ -12,7 +12,6 @@
       name="default"
       title="collective.contentgroups"
       directory="profiles/default"
-      description="Installs the collective.contentgroups add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.post_install"
       />
@@ -21,7 +20,6 @@
       name="uninstall"
       title="collective.contentgroups (uninstall)"
       directory="profiles/uninstall"
-      description="Uninstalls the collective.contentgroups add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
       post_handler=".setuphandlers.uninstall"
       />
@@ -39,22 +37,5 @@
       factory=".behavior.Group"
       marker=".interfaces.IGroupMarker"
       />
-
-  <genericsetup:registerProfile
-      name="default"
-      title="collective.contentgroups"
-      directory="profiles/default"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      post_handler=".setuphandlers.post_install"
-      />
-
-  <genericsetup:registerProfile
-      name="uninstall"
-      title="collective.contentgroups (uninstall)"
-      directory="profiles/uninstall"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      post_handler=".setuphandlers.uninstall"
-      />
-
 
 </configure>
