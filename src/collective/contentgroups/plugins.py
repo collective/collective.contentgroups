@@ -81,6 +81,28 @@ class ContentGroupsPlugin(BasePlugin):
             results.append({"id": group.getId, "pluginid": self.getId()})
         return results
 
+    # Start of IGroupsPlugin
+
+    def getGroupsForPrincipal(self, principal, request=None):
+        """ principal -> (group_1, ... group_N)
+
+        o Return a sequence of group names to which the principal
+          (either a user or another group) belongs.
+
+        o May assign groups based on values in the REQUEST object, if present
+        """
+        # TODO It may be nice for performace to store this somewhere, probably a BTree in a utility,
+        # much like the redirection tool.
+        logger.warning("getGroupsForPrincipal for {0} ignored".format(principal))
+        groups = api.content.find(object_provides=IGroupMarker)
+        principal_id = principal.id
+        found = []
+        for group in groups:
+            obj = group.getObject()
+            if principal_id in obj.users:
+                found.append(obj.id)
+        return found
+
     # Start of IGroupIntrospection
 
     def getGroupById(self, group_id, default=None):
@@ -125,7 +147,7 @@ class ContentGroupsPlugin(BasePlugin):
 
         Taken over from Products.PlonePAS.plugins.group.
 
-        TODO: instead of PloneGroup, this could possibly use
+        TODO: instead of PloneGroup, this should probably use
         content items: the found item with our behavior.
         """
         return PloneGroup(group_id, name).__of__(self)
@@ -164,6 +186,7 @@ InitializeClass(ContentGroupsPlugin)
 classImplements(
     ContentGroupsPlugin,
     plugins.IGroupEnumerationPlugin,
+    plugins.IGroupsPlugin,
     group_plugins.IGroupIntrospection,
 )
 
