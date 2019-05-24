@@ -3,8 +3,9 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from collective.contentgroups.interfaces import IGroupMarker
 from plone import api
-from Products.PluggableAuthService.interfaces import plugins
 from Products.PlonePAS.interfaces import group as group_plugins
+from Products.PlonePAS.plugins.group import PloneGroup
+from Products.PluggableAuthService.interfaces import plugins
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.utils import classImplements
 
@@ -82,30 +83,89 @@ class ContentGroupsPlugin(BasePlugin):
 
     # Start of IGroupIntrospection
 
-    def getGroupById(self, group_id):
+    def getGroupById(self, group_id, default=None):
         """
         Returns the portal_groupdata-ish object for a group
         corresponding to this id.
+
+        Taken over from Products.PlonePAS.plugins.group.
         """
+        if group_id not in self.getGroupIds():
+            return default
+        plugins = self._getPAS()._getOb("plugins")
+        return self._findGroup(plugins, group_id)
 
     def getGroups(self):
+        """Returns an iteration of the available groups
+
+        Taken over from Products.PlonePAS.plugins.group.
         """
-        Returns an iteration of the available groups
-        """
+        return [self.getGroupById(group_id) for group_id in self.getGroupIds()]
 
     def getGroupIds(self):
+        """Returns a list of the available groups.
         """
-        Returns a list of the available groups
-        """
+        return [group["id"] for group in self.enumerateGroups()]
 
     def getGroupMembers(self, group_id):
         """
         return the members of the given group
         """
+        groups = self.enumerateGroups(id=group_id)
+        if not groups:
+            return []
+        group = groups[0]
+        return group.getObject().users
+
+    # group wrapping mechanics for IGroupIntrospection
+
+    @security.private
+    def _createGroup(self, plugins, group_id, name):
+        """Create group object.
+
+        Taken over from Products.PlonePAS.plugins.group.
+
+        TODO: instead of PloneGroup, this could possibly use
+        content items: the found item with our behavior.
+        """
+        return PloneGroup(group_id, name).__of__(self)
+
+    @security.private
+    def _findGroup(self, plugins, group_id, title=None, request=None):
+        """group_id -> decorated_group
+
+        This method based on PluggableAuthService._findGroup
+        Taken over from Products.PlonePAS.plugins.group.
+        """
+        group = self._createGroup(plugins, group_id, title)
+
+        # propfinders = plugins.listPlugins(IPropertiesPlugin)
+        # for propfinder_id, propfinder in propfinders:
+        #     data = propfinder.getPropertiesForUser(group, request)
+        #     if data:
+        #         group.addPropertysheet(propfinder_id, data)
+
+        # groups = self._getPAS()._getGroupsForPrincipal(group, request, plugins=plugins)
+        # group._addGroups(groups)
+
+        # rolemakers = plugins.listPlugins(IRolesPlugin)
+
+        # for rolemaker_id, rolemaker in rolemakers:
+        #     roles = rolemaker.getRolesForPrincipal(group, request)
+        #     if roles:
+        #         group._addRoles(roles)
+
+        group._addRoles(["Authenticated"])
+
+        return group.__of__(self)
 
 
 InitializeClass(ContentGroupsPlugin)
-classImplements(ContentGroupsPlugin, plugins.IGroupEnumerationPlugin, group_plugins.IGroupIntrospection)
+classImplements(
+    ContentGroupsPlugin,
+    plugins.IGroupEnumerationPlugin,
+    group_plugins.IGroupIntrospection,
+)
 
 
 def add_contentgroups_plugin():
