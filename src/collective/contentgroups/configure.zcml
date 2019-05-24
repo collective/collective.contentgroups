@@ -1,0 +1,60 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="collective.contentgroups">
+
+  <include package="plone.behavior" file="meta.zcml"/>
+  <five:registerPackage package="." initialize=".initialize" />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="collective.contentgroups"
+      directory="profiles/default"
+      description="Installs the collective.contentgroups add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="collective.contentgroups (uninstall)"
+      directory="profiles/uninstall"
+      description="Uninstalls the collective.contentgroups add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
+      />
+
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="collective.contentgroups-hiddenprofiles"
+      />
+
+  <plone:behavior
+      name="collective.contentgroups.group"
+      title="Group"
+      description="Makes the content a group, with users"
+      provides=".behavior.IGroup"
+      factory=".behavior.Group"
+      marker=".interfaces.IGroupMarker"
+      />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="collective.contentgroups"
+      directory="profiles/default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="collective.contentgroups (uninstall)"
+      directory="profiles/uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
+      />
+
+
+</configure>
