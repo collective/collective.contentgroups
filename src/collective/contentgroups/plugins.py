@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
+from collective.contentgroups.interfaces import IGroupMarker
+from plone import api
 from Products.PluggableAuthService.interfaces import plugins
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.utils import classImplements
@@ -18,9 +20,63 @@ class ContentGroupsPlugin(BasePlugin):
     meta_type = "ContentGroups Plugin"
     security = ClassSecurityInfo()
 
+    # Start of IGroupEnumerationPlugin
+
+    def enumerateGroups(
+        self, id=None, exact_match=False, sort_by=None, max_results=None, **kw
+    ):
+
+        """ -> (group_info_1, ... group_info_N)
+
+        o Return mappings for groups matching the given criteria.
+
+        o 'id' in combination with 'exact_match' true, will
+          return at most one mapping per supplied ID ('id'
+          may be a sequence).
+
+        o If 'exact_match' is False, then 'id' may be treated by
+          the plugin as "contains" searches (more complicated searches
+          may be supported by some plugins using other keyword arguments).
+
+        o If 'sort_by' is passed, the results will be sorted accordingly.
+          known valid values are 'id' (some plugins may support others).
+
+        o If 'max_results' is specified, it must be a positive integer,
+          limiting the number of returned mappings.  If unspecified, the
+          plugin should return mappings for all groups satisfying the
+          criteria.
+
+        o Minimal keys in the returned mappings:
+
+          'id' -- (required) the group ID
+
+          'pluginid' -- (required) the plugin ID (as returned by getId())
+
+          'properties_url' -- (optional) the URL to a page for updating the
+                              group's properties.
+
+          'members_url' -- (optional) the URL to a page for updating the
+                           principals who belong to the group.
+
+        o Plugin *must* ignore unknown criteria.
+
+        o Plugin may raise ValueError for invalid critera.
+
+        o Insufficiently-specified criteria may have catastrophic
+          scaling issues for some implementations.
+        """
+        if id or exact_match or sort_by or max_results or kw:
+            # TODO
+            logger.warning("Ignoring all arguments to enumerateGroups.")
+        groups = api.content.find(object_provides=IGroupMarker)
+        results = []
+        for group in groups:
+            results.append({"id": group.getId, "pluginid": self.getId()})
+        return results
+
 
 InitializeClass(ContentGroupsPlugin)
-classImplements(ContentGroupsPlugin, plugins.IRolesPlugin)
+classImplements(ContentGroupsPlugin, plugins.IGroupEnumerationPlugin)
 
 
 def add_contentgroups_plugin():
