@@ -4,6 +4,7 @@ from AccessControl.class_init import InitializeClass
 from collective.contentgroups.interfaces import IGroupMarker
 from plone import api
 from Products.PluggableAuthService.interfaces import plugins
+from Products.PlonePAS.interfaces import group as group_plugins
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.utils import classImplements
 
@@ -23,7 +24,13 @@ class ContentGroupsPlugin(BasePlugin):
     # Start of IGroupEnumerationPlugin
 
     def enumerateGroups(
-        self, id=None, exact_match=False, sort_by=None, max_results=None, **kw
+        # C816 missing trailing comma in Python 3.6+, but black removes it
+        self,
+        id=None,
+        exact_match=False,
+        sort_by=None,
+        max_results=None,
+        **kw  # noqa C816
     ):
 
         """ -> (group_info_1, ... group_info_N)
@@ -66,7 +73,6 @@ class ContentGroupsPlugin(BasePlugin):
           scaling issues for some implementations.
         """
         if id or exact_match or sort_by or max_results or kw:
-            # TODO
             logger.warning("Ignoring all arguments to enumerateGroups.")
         groups = api.content.find(object_provides=IGroupMarker)
         results = []
@@ -74,9 +80,32 @@ class ContentGroupsPlugin(BasePlugin):
             results.append({"id": group.getId, "pluginid": self.getId()})
         return results
 
+    # Start of IGroupIntrospection
+
+    def getGroupById(self, group_id):
+        """
+        Returns the portal_groupdata-ish object for a group
+        corresponding to this id.
+        """
+
+    def getGroups(self):
+        """
+        Returns an iteration of the available groups
+        """
+
+    def getGroupIds(self):
+        """
+        Returns a list of the available groups
+        """
+
+    def getGroupMembers(self, group_id):
+        """
+        return the members of the given group
+        """
+
 
 InitializeClass(ContentGroupsPlugin)
-classImplements(ContentGroupsPlugin, plugins.IGroupEnumerationPlugin)
+classImplements(ContentGroupsPlugin, plugins.IGroupEnumerationPlugin, group_plugins.IGroupIntrospection)
 
 
 def add_contentgroups_plugin():
