@@ -73,10 +73,21 @@ class ContentGroupsPlugin(BasePlugin):
         o Insufficiently-specified criteria may have catastrophic
           scaling issues for some implementations.
         """
-        if id or exact_match or sort_by or max_results or kw:
-            logger.warning("Ignoring all arguments to enumerateGroups.")
-        groups = api.content.find(object_provides=IGroupMarker)
+        if exact_match:
+            logger.warning(
+                "Ignoring exact_match=%s argument to enumerateGroups.", exact_match
+            )
+        if sort_by:
+            logger.warning("Ignoring sort_by=%r argument to enumerateGroups.", sort_by)
+        if kw:
+            logger.warning("Ignoring keyword arguments %r to enumerateGroups.", kw)
+        query = {"object_provides": IGroupMarker}
+        if id:
+            query["id"] = id
+        groups = api.content.find(**query)
         results = []
+        if max_results is not None:
+            groups = groups[:max_results]
         for group in groups:
             results.append({"id": group.getId, "pluginid": self.getId()})
         return results
@@ -91,16 +102,21 @@ class ContentGroupsPlugin(BasePlugin):
 
         o May assign groups based on values in the REQUEST object, if present
         """
-        # TODO It may be nice for performace to store this somewhere, probably a BTree in a utility,
+        # TODO It may be nice for performance to store this somewhere, probably a BTree in a utility,
         # much like the redirection tool.
-        logger.warning("getGroupsForPrincipal for {0} ignored".format(principal))
         groups = api.content.find(object_provides=IGroupMarker)
         principal_id = principal.id
         found = []
         for group in groups:
             obj = group.getObject()
+            if not obj.users:
+                continue
             if principal_id in obj.users:
                 found.append(obj.id)
+        if found:
+            logger.info(
+                "getGroupsForPrincipal for {0} returned: {1}".format(principal, found)
+            )
         return found
 
     # Start of IGroupIntrospection
@@ -133,11 +149,15 @@ class ContentGroupsPlugin(BasePlugin):
         """
         return the members of the given group
         """
-        groups = self.enumerateGroups(id=group_id)
+        groups = api.content.find(object_provides=IGroupMarker, id=group_id)
         if not groups:
             return []
         group = groups[0]
-        return group.getObject().users
+        users = group.getObject().users
+        if not users:
+            return []
+        # This is (at least currently) a Text field.
+        return users.splitlines()
 
     # group wrapping mechanics for IGroupIntrospection
 

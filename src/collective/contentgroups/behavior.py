@@ -2,9 +2,9 @@
 from collective.contentgroups import _
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.dexterity.interfaces import IDexterityContent
-from plone.namedfile import field as namedfile
 from plone.supermodel import model
 from Products.CMFPlone.utils import base_hasattr
+from zope import schema
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import provider
@@ -15,7 +15,7 @@ class IGroup(model.Schema):
     """
     """
 
-    users = namedfile.NamedBlobImage(
+    users = schema.Text(
         title=_(u"users_field_title", default=u"Users"),
         description=_(u"users_field_description", default=u""),
         required=False,
