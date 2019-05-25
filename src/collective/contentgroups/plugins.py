@@ -180,6 +180,11 @@ class ContentGroupsPlugin(BasePlugin):
 
         TODO: instead of PloneGroup, this should probably use
         content items: the found item with our behavior.
+        But the old Products.membrane does the same,
+        and has copied the same methods and comments from PlonePAS.
+
+        Note that PloneGroup is an on-the-fly created object,
+        comparable with a BrowserView: after the request is finished, it is gone.
         """
         return PloneGroup(group_id, name).__of__(self)
 
@@ -191,6 +196,7 @@ class ContentGroupsPlugin(BasePlugin):
         Taken over from Products.PlonePAS.plugins.group.
         """
         group = self._createGroup(plugins, group_id, title)
+        group.title = title or group_id
 
         # propfinders = plugins.listPlugins(IPropertiesPlugin)
         # for propfinder_id, propfinder in propfinders:
