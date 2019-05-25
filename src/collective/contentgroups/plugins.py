@@ -185,6 +185,19 @@ class ContentGroupsPlugin(BasePlugin):
 
         Note that PloneGroup is an on-the-fly created object,
         comparable with a BrowserView: after the request is finished, it is gone.
+
+        Also, when portal_groups returns a group, like is done when you visit
+        http://localhost:8080/Plone/@@usergroup-groupdetails?groupname=group1
+        then this is whatever we return here, wrapped in a GroupData object.
+        So it may be nicer if we return something ourselves that implements
+        Products.PlonePAS.interfaces.group.IGroupData.
+
+        We could define an adapter from IGroupMarker to IGroupData
+        and return IGroupData(group_brain.getObject()).
+
+        Maybe even IGroupData(group_brain) could work,
+        although we miss the users attribute then.
+        If we have a utility that stores this info, we could get it from there too.
         """
         return PloneGroup(group_id, name).__of__(self)
 
