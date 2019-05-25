@@ -45,6 +45,7 @@ class ContentGroupsPlugin(BasePlugin):
         o If 'exact_match' is False, then 'id' may be treated by
           the plugin as "contains" searches (more complicated searches
           may be supported by some plugins using other keyword arguments).
+          TODO: not supported yet
 
         o If 'sort_by' is passed, the results will be sorted accordingly.
           known valid values are 'id' (some plugins may support others).
@@ -73,10 +74,6 @@ class ContentGroupsPlugin(BasePlugin):
         o Insufficiently-specified criteria may have catastrophic
           scaling issues for some implementations.
         """
-        if exact_match:
-            logger.warning(
-                "Ignoring exact_match=%s argument to enumerateGroups.", exact_match
-            )
         if sort_by:
             logger.warning("Ignoring sort_by=%r argument to enumerateGroups.", sort_by)
         if kw:
@@ -89,8 +86,18 @@ class ContentGroupsPlugin(BasePlugin):
         if max_results is not None:
             groups = groups[:max_results]
         for group in groups:
-            results.append({"id": group.getId, "pluginid": self.getId()})
+            results.append(
+                {"id": group.getId, "pluginid": self.getId(), "title": group.Title}
+            )
         return results
+
+    def _get_single_group_brain(self, group_id):
+        """Helper method to get the brain of a single group by id."""
+        query = {"object_provides": IGroupMarker, "id": group_id}
+        groups = api.content.find(**query)
+        if not groups:
+            return
+        return groups[0]
 
     # Start of IGroupsPlugin
 
@@ -131,7 +138,12 @@ class ContentGroupsPlugin(BasePlugin):
         if group_id not in self.getGroupIds():
             return default
         plugins = self._getPAS()._getOb("plugins")
-        return self._findGroup(plugins, group_id)
+        group = self._get_single_group_brain(group_id)
+        if group is None:
+            title = ""
+        else:
+            title = group.Title
+        return self._findGroup(plugins, group_id, title)
 
     def getGroups(self):
         """Returns an iteration of the available groups
@@ -149,10 +161,9 @@ class ContentGroupsPlugin(BasePlugin):
         """
         return the members of the given group
         """
-        groups = api.content.find(object_provides=IGroupMarker, id=group_id)
-        if not groups:
+        group = self._get_single_group_brain(group_id)
+        if not group:
             return []
-        group = groups[0]
         users = group.getObject().users
         if not users:
             return []
