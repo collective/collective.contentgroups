@@ -162,7 +162,7 @@ class ContentGroupsPlugin(BasePlugin):
             group._addGroups(groups)
 
         # Apparently it may help if this is acquisition wrapped.
-        # But our current GroupAdapter has no __of__ method, so maybe not.
+        # But PlonePAS already does this, so it seems we may not need this.
         # return group.__of__(self)
         return group
 

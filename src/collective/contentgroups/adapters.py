@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
+from AccessControl.users import BasicUser
 
 
-class GroupAdapter(object):
+class GroupAdapter(BasicUser):
     """This adapts items with our group behavior to IGroupData from PlonePAS.
 
     The IGroupData interface says this "is an abstract interface for accessing
