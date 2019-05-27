@@ -21,6 +21,7 @@ class GroupAdapter(BasicUser):
     def __init__(self, group):
         self.group = group
         self._id = group.id
+        self._title = self.group.Title() or group.id
         self._groups = {}
         self._roles = {}
         users = self.group.users
@@ -142,7 +143,7 @@ class GroupAdapter(BasicUser):
     def getProperty(self, id):
         """Return the value of the property specified by 'id'."""
         if id == "title":
-            return self.group.Title()
+            return self._title
         raise KeyError
 
     def getProperties(self):
@@ -150,7 +151,7 @@ class GroupAdapter(BasicUser):
 
         Properties are as usual in Zope.
         """
-        return {"title": self.group.Title()}
+        return {"title": self._title}
 
     def getGroupId(self):
         """Return the string id of this group, WITHOUT group prefix."""
@@ -203,6 +204,15 @@ class GroupAdapter(BasicUser):
         Varies by group implementation (GRUF/Nux/et al).
         """
         return self.group
+
+    def getGroupTitleOrName(self):
+        """Get the Title property of the group.
+
+        If there is none then return the name.
+        Method is on GroupData object, but is not defined in the interface.
+        Plone needs it anyway.
+        """
+        return self._title
 
 
 InitializeClass(GroupAdapter)
