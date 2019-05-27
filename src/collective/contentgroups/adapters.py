@@ -143,6 +143,13 @@ class GroupAdapter(BasicUser):
         list"""
         raise NotImplementedError
 
+    def canWriteProperty(object, id):
+        """Check if a property can be modified.
+
+        We do not support this.
+        """
+        return False
+
     def getProperty(self, id, default=_marker):
         """Return the value of the property specified by 'id'."""
         if id == "title":
