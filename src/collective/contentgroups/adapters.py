@@ -20,7 +20,7 @@ class GroupAdapter(BasicUser):
 
     def __init__(self, group):
         self.group = group
-        self._id = group.id
+        self.id = group.id
         self._title = self.group.Title() or group.id
         self._groups = {}
         self._roles = {}
@@ -37,7 +37,7 @@ class GroupAdapter(BasicUser):
 
         This is from IBasicUser.
         """
-        return self._id
+        return self.id
 
     @security.private
     def getMemberIds(self, transitive=1):
