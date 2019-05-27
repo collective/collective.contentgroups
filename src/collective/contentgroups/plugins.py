@@ -163,8 +163,8 @@ class ContentGroupsPlugin(BasePlugin):
 
         # Apparently it may help if this is acquisition wrapped.
         # But PlonePAS already does this, so it seems we may not need this.
-        # return group.__of__(self)
-        return group
+        return group.__of__(self)
+        # return group
 
     def getGroups(self):
         """Returns an iteration of the available groups

@@ -2,6 +2,7 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from AccessControl.users import BasicUser
+from Acquisition import aq_parent
 
 
 class GroupAdapter(BasicUser):
@@ -238,13 +239,28 @@ class GroupAdapter(BasicUser):
         """Check if a property can be modified."""
         return False
 
+    def _group_id_in_plugin(self, group_id):
+        # Is group id part of our plugin?
+        plugin = aq_parent(self)
+        return group_id in plugin.getGroupIds()
+
     def canAddToGroup(self, group_id):
-        """True if group can be added to other group."""
-        return False
+        """True if group can be added to other group.
+
+        We allow this, because this does not require code of ourselves.
+        Well, maybe if the other group_id is also a content group...
+        Indeed, that gives a KeyError in
+        Products.PluggableAuthService.plugins.ZODBGroupManager in addPrincipalToGroup.
+        """
+        return not self._group_id_in_plugin(group_id)
 
     def canRemoveFromGroup(self, group_id):
-        """True if group can be removed from other group."""
-        return False
+        """True if group can be removed from other group.
+
+        We allow this, because this does not require code of ourselves.
+        Well, maybe if the other group_id is also a content group...
+        """
+        return not self._group_id_in_plugin(group_id)
 
     def canAssignRole(self, role_id):
         """True if group can be assigned role. Role id is string."""
