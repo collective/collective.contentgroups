@@ -4,6 +4,9 @@ from AccessControl.class_init import InitializeClass
 from AccessControl.users import BasicUser
 
 
+_marker = object()
+
+
 class GroupAdapter(BasicUser):
     """This adapts items with our group behavior to IGroupData from PlonePAS.
 
@@ -140,11 +143,14 @@ class GroupAdapter(BasicUser):
         list"""
         raise NotImplementedError
 
-    def getProperty(self, id):
+    def getProperty(self, id, default=_marker):
         """Return the value of the property specified by 'id'."""
         if id == "title":
             return self._title
-        raise KeyError
+        if default is _marker:
+            raise KeyError
+        # A default was passed in explicitly, so use it.
+        return default
 
     def getProperties(self):
         """Return the properties of this group.
