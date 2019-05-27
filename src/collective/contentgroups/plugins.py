@@ -4,8 +4,7 @@ from AccessControl.class_init import InitializeClass
 from collective.contentgroups.interfaces import IGroupMarker
 from plone import api
 from Products.PlonePAS.interfaces import group as group_plugins
-from Products.PlonePAS.plugins.group import PloneGroup
-from Products.PluggableAuthService.interfaces import plugins
+from Products.PluggableAuthService.interfaces import plugins as pas_plugins
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.utils import classImplements
 
@@ -112,13 +111,13 @@ class ContentGroupsPlugin(BasePlugin):
         # TODO It may be nice for performance to store this somewhere, probably a BTree in a utility,
         # much like the redirection tool.
         groups = api.content.find(object_provides=IGroupMarker)
-        principal_id = principal.id
+        principal_id = principal.getId()
         found = []
         for group in groups:
             obj = group.getObject()
             if not obj.users:
                 continue
-            if principal_id in obj.users:
+            if principal_id in obj.users.splitlines():
                 found.append(obj.id)
         if found:
             logger.info(
@@ -137,13 +136,35 @@ class ContentGroupsPlugin(BasePlugin):
         """
         if group_id not in self.getGroupIds():
             return default
-        plugins = self._getPAS()._getOb("plugins")
-        group = self._get_single_group_brain(group_id)
+        brain = self._get_single_group_brain(group_id)
+        if brain is None:
+            return default
+        group = group_plugins.IGroupData(brain.getObject(), None)
         if group is None:
-            title = ""
-        else:
-            title = group.Title
-        return self._findGroup(plugins, group_id, title)
+            return default
+
+        # Some of the next calls need a request, but it may be None.
+        request = None
+
+        # Determine the roles.
+        pas = self._getPAS()
+        plugins = pas._getOb("plugins")
+        rolemakers = plugins.listPlugins(pas_plugins.IRolesPlugin)
+        for rolemaker_id, rolemaker in rolemakers:
+            roles = rolemaker.getRolesForPrincipal(group, request)
+            if roles:
+                group._addRoles(roles)
+        group._addRoles(["Authenticated"])
+
+        # TODO: should we fill _groups as well?  PloneGroup does not do this.
+        groups = pas._getGroupsForPrincipal(group, request, plugins=plugins)
+        if groups:
+            group._addGroups(groups)
+
+        # Apparently it may help if this is acquisition wrapped.
+        # But our current GroupAdapter has no __of__ method, so maybe not.
+        # return group.__of__(self)
+        return group
 
     def getGroups(self):
         """Returns an iteration of the available groups
@@ -170,73 +191,12 @@ class ContentGroupsPlugin(BasePlugin):
         # This is (at least currently) a Text field.
         return users.splitlines()
 
-    # group wrapping mechanics for IGroupIntrospection
-
-    @security.private
-    def _createGroup(self, plugins, group_id, name):
-        """Create group object.
-
-        Taken over from Products.PlonePAS.plugins.group.
-
-        TODO: instead of PloneGroup, this should probably use
-        content items: the found item with our behavior.
-        But the old Products.membrane does the same,
-        and has copied the same methods and comments from PlonePAS.
-
-        Note that PloneGroup is an on-the-fly created object,
-        comparable with a BrowserView: after the request is finished, it is gone.
-
-        Also, when portal_groups returns a group, like is done when you visit
-        http://localhost:8080/Plone/@@usergroup-groupdetails?groupname=group1
-        then this is whatever we return here, wrapped in a GroupData object.
-        So it may be nicer if we return something ourselves that implements
-        Products.PlonePAS.interfaces.group.IGroupData.
-
-        We could define an adapter from IGroupMarker to IGroupData
-        and return IGroupData(group_brain.getObject()).
-
-        Maybe even IGroupData(group_brain) could work,
-        although we miss the users attribute then.
-        If we have a utility that stores this info, we could get it from there too.
-        """
-        return PloneGroup(group_id, name).__of__(self)
-
-    @security.private
-    def _findGroup(self, plugins, group_id, title=None, request=None):
-        """group_id -> decorated_group
-
-        This method based on PluggableAuthService._findGroup
-        Taken over from Products.PlonePAS.plugins.group.
-        """
-        group = self._createGroup(plugins, group_id, title)
-        group.title = title or group_id
-
-        # propfinders = plugins.listPlugins(IPropertiesPlugin)
-        # for propfinder_id, propfinder in propfinders:
-        #     data = propfinder.getPropertiesForUser(group, request)
-        #     if data:
-        #         group.addPropertysheet(propfinder_id, data)
-
-        # groups = self._getPAS()._getGroupsForPrincipal(group, request, plugins=plugins)
-        # group._addGroups(groups)
-
-        # rolemakers = plugins.listPlugins(IRolesPlugin)
-
-        # for rolemaker_id, rolemaker in rolemakers:
-        #     roles = rolemaker.getRolesForPrincipal(group, request)
-        #     if roles:
-        #         group._addRoles(roles)
-
-        group._addRoles(["Authenticated"])
-
-        return group.__of__(self)
-
 
 InitializeClass(ContentGroupsPlugin)
 classImplements(
     ContentGroupsPlugin,
-    plugins.IGroupEnumerationPlugin,
-    plugins.IGroupsPlugin,
+    pas_plugins.IGroupEnumerationPlugin,
+    pas_plugins.IGroupsPlugin,
     group_plugins.IGroupIntrospection,
 )
 

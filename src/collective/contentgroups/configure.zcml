@@ -37,5 +37,10 @@
       factory=".behavior.Group"
       marker=".interfaces.IGroupMarker"
       />
+ <adapter
+      factory=".adapters.GroupAdapter"
+      provides="Products.PlonePAS.interfaces.group.IGroupData"
+      for=".interfaces.IGroupMarker"
+      />
 
 </configure>
