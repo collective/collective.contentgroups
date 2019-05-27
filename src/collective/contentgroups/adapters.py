@@ -215,6 +215,16 @@ class GroupAdapter(BasicUser):
         """
         return self._title
 
+    def setGroupProperties(self, mapping):
+        """PAS-specific method to set the properties of a group.
+
+        Part of GroupData.
+        """
+        if not mapping:
+            # Do not bother complaining.
+            return
+        raise NotImplementedError
+
     # Products.PlonePAS.interfaces.capabilities.IManageCapabilities:
     # Interface for MemberData/GroupData to provide information as to whether
     # or not the member can be deleted, reset password, modify a property.
