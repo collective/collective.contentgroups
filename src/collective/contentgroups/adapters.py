@@ -143,13 +143,6 @@ class GroupAdapter(BasicUser):
         list"""
         raise NotImplementedError
 
-    def canWriteProperty(object, id):
-        """Check if a property can be modified.
-
-        We do not support this.
-        """
-        return False
-
     def getProperty(self, id, default=_marker):
         """Return the value of the property specified by 'id'."""
         if id == "title":
@@ -227,5 +220,40 @@ class GroupAdapter(BasicUser):
         """
         return self._title
 
+    # Products.PlonePAS.interfaces.capabilities.IManageCapabilities:
+    # Interface for MemberData/GroupData to provide information as to whether
+    # or not the member can be deleted, reset password, modify a property.
+    # Several of these are called by
+    # Products.CMFPlone.controlpanel.browser.usergroups_groupsoverview
+    # in doSearch.
+    # Most of this we do not support: you should use the content UI.
+
+    def canDelete(self):
+        """True if group can be removed from the Plone UI."""
+        return False
+
+    def canPasswordSet(self):
+        """True if group can change password."""
+        return False
+
+    def passwordInClear(self):
+        """True if password can be retrieved in the clear (not hashed.)"""
+        return False
+
+    def canWriteProperty(self, id):
+        """Check if a property can be modified."""
+        return False
+
+    def canAddToGroup(self, group_id):
+        """True if group can be added to other group."""
+        return False
+
+    def canRemoveFromGroup(self, group_id):
+        """True if group can be removed from other group."""
+        return False
+
+    def canAssignRole(self, role_id):
+        """True if group can be assigned role. Role id is string."""
+        return False
 
 InitializeClass(GroupAdapter)
