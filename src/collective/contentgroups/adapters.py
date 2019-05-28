@@ -29,7 +29,7 @@ class GroupAdapter(BasicUser):
         if users:
             self._userids = tuple(filter(None, users.splitlines()))
         else:
-            self._userids = []
+            self._userids = tuple()
 
     # from Products.PlonePAS.plugins.group.PloneGroup:
 
@@ -45,13 +45,16 @@ class GroupAdapter(BasicUser):
         """Return member ids of this group, including or not
         transitive groups.
         """
-        raise NotImplementedError
+        if transitive:
+            # not implemented for now.
+            raise NotImplementedError
+        return self._userids
 
     @security.public
     def getRolesInContext(self, object):
         """Since groups can't actually log in, do nothing.
         """
-        return []
+        return tuple()
 
     @security.public
     def allowed(self, object, object_roles=None):
