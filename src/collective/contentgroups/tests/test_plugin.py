@@ -1,18 +1,45 @@
 # -*- coding: utf-8 -*-
 from collective.contentgroups.config import PLUGIN_ID
-from collective.contentgroups.plugins import ContentGroupsPlugin
-from zope.publisher.browser import TestRequest
+from collective.contentgroups import testing
+from Products.PlonePAS.plugins.ufactory import PloneUser
 
 import unittest
 
 
-class BasePluginTestCase(unittest.TestCase):
-    """Base test case class with a few helper methods."""
+class PluginEmptyTestCase(unittest.TestCase):
+    """Test our plugin without any groups."""
 
-    def _make_plugin(self, request=None):
-        plugin = ContentGroupsPlugin()
-        plugin.id = PLUGIN_ID
-        if request is None:
-            request = TestRequest()
-        plugin.REQUEST = request
-        return plugin
+    layer = testing.COLLECTIVE_CONTENT_GROUPS_INTEGRATION_TESTING
+
+    def setUp(self):
+        """Custom shared utility setup for tests."""
+        self.portal = self.layer["portal"]
+        self.plugin = self.portal.acl_users[PLUGIN_ID]
+
+    def _makeUser(self, userid="who"):
+        # Create a transient/temporary user (much like our GroupAdapter is transient/temporary).
+        return PloneUser(userid)
+
+    def test_enumerateGroups_empty(self):
+        self.assertTupleEqual(self.plugin.enumerateGroups(), ())
+
+    def test_get_single_group_brain_empty(self):
+        self.assertIsNone(self.plugin._get_single_group_brain("who"))
+
+    def test_getGroupsForPrincipal_empty(self):
+        user = self._makeUser()
+        self.assertTupleEqual(self.plugin.getGroupsForPrincipal(user), ())
+
+    def test_getGroupById_empty(self):
+        self.assertIsNone(self.plugin.getGroupById("who"))
+        marker = object()
+        self.assertEqual(self.plugin.getGroupById("who", marker), marker)
+
+    def test_getGroups_empty(self):
+        self.assertTupleEqual(self.plugin.getGroups(), ())
+
+    def test_getGroupIds_empty(self):
+        self.assertTupleEqual(self.plugin.getGroupIds(), ())
+
+    def test_getGroupMembers_empty(self):
+        self.assertTupleEqual(self.plugin.getGroupMembers("who"), ())

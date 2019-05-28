@@ -88,7 +88,7 @@ class ContentGroupsPlugin(BasePlugin):
             results.append(
                 {"id": group.getId, "pluginid": self.getId(), "title": group.Title}
             )
-        return results
+        return tuple(results)
 
     def _get_single_group_brain(self, group_id):
         """Helper method to get the brain of a single group by id."""
@@ -123,7 +123,7 @@ class ContentGroupsPlugin(BasePlugin):
             logger.info(
                 "getGroupsForPrincipal for {0} returned: {1}".format(principal, found)
             )
-        return found
+        return tuple(found)
 
     # Start of IGroupIntrospection
 
@@ -171,12 +171,12 @@ class ContentGroupsPlugin(BasePlugin):
 
         Taken over from Products.PlonePAS.plugins.group.
         """
-        return [self.getGroupById(group_id) for group_id in self.getGroupIds()]
+        return tuple([self.getGroupById(group_id) for group_id in self.getGroupIds()])
 
     def getGroupIds(self):
         """Returns a list of the available groups.
         """
-        return [group["id"] for group in self.enumerateGroups()]
+        return tuple([group["id"] for group in self.enumerateGroups()])
 
     def getGroupMembers(self, group_id):
         """
@@ -184,12 +184,12 @@ class ContentGroupsPlugin(BasePlugin):
         """
         group = self._get_single_group_brain(group_id)
         if not group:
-            return []
+            return tuple()
         users = group.getObject().users
         if not users:
-            return []
+            return tuple()
         # This is (at least currently) a Text field.
-        return users.splitlines()
+        return tuple(users.splitlines())
 
 
 InitializeClass(ContentGroupsPlugin)
