@@ -39,7 +39,7 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             # default argument transitive=1 is not supported for now
             adapter.getMemberIds()
-        self.assertTupleEqual(adapter.getMemberIds(transitive=0), ())
+        self.assertListEqual(adapter.getMemberIds(transitive=0), [])
 
     def test_getMemberIds_filled(self):
         group = self._makeGroup()
@@ -48,12 +48,12 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             # default argument transitive=1 is not supported for now
             adapter.getMemberIds()
-        self.assertTupleEqual(adapter.getMemberIds(transitive=0), ("arthur", "betty"))
+        self.assertListEqual(adapter.getMemberIds(transitive=0), ["arthur", "betty"])
 
     def test_getRolesInContext(self):
         adapter = self._makeAdapter()
         context = object()
-        self.assertTupleEqual(adapter.getRolesInContext(context), ())
+        self.assertListEqual(adapter.getRolesInContext(context), [])
 
     def test_allowed(self):
         adapter = self._makeAdapter()

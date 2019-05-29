@@ -26,9 +26,9 @@ class GroupAdapter(BasicUser):
         self._roles = set()
         users = self.group.users
         if users:
-            self._userids = tuple(filter(None, users.splitlines()))
+            self._userids = list(filter(None, users.splitlines()))
         else:
-            self._userids = tuple()
+            self._userids = []
 
     # from Products.PlonePAS.plugins.group.PloneGroup:
 
@@ -53,7 +53,7 @@ class GroupAdapter(BasicUser):
     def getRolesInContext(self, object):
         """Since groups can't actually log in, do nothing.
         """
-        return tuple()
+        return []
 
     @security.public
     def allowed(self, object, object_roles=None):
