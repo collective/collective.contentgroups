@@ -127,3 +127,32 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
         self.assertListEqual(
             adapter.getRoles(), ["Editor", "Manager", "cook", "foodie"]
         )
+
+    def test_setProperties(self):
+        adapter = self._makeAdapter()
+        with self.assertRaises(NotImplementedError):
+            # We do not support this.
+            adapter.setProperties()
+
+    def test_getProperty(self):
+        # only title is available as property
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getProperty("title"), "Group1")
+        self.assertIsNone(adapter.getProperty("email"))
+        self.assertEqual(adapter.getProperty("email", "default"), "default")
+
+    def test_getProperties(self):
+        adapter = self._makeAdapter()
+        self.assertDictEqual(adapter.getProperties(), {"title": "Group1"})
+
+    def test_getGroupId(self):
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getGroupId(), "group1")
+
+    def test_getMemberId(self):
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getMemberId(), "group1")
+
+    def test_getGroupName(self):
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getGroupName(), "group1")

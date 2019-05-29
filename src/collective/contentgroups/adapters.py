@@ -147,8 +147,9 @@ class GroupAdapter(BasicUser):
 
     def setProperties(self, properties=None, **kw):
         """Allows setting of group properties en masse.
-        Properties can be given either as a dict or a keyword parameters
-        list"""
+
+        Properties can be given either as a dict or a keyword parameters list.
+        """
         raise NotImplementedError
 
     def getProperty(self, id, default=None):
