@@ -289,6 +289,9 @@ class GroupAdapter(BasicUser):
     def _group_id_in_plugin(self, group_id):
         # Is group id part of our plugin?
         plugin = aq_parent(self)
+        if plugin is None:
+            # happens in basic unit tests
+            return False
         return group_id in plugin.getGroupIds()
 
     def canAddToGroup(self, group_id):

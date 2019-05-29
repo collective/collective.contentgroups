@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from Acquisition import Implicit
 from collective.contentgroups.adapters import GroupAdapter
 from Products.PlonePAS.plugins.ufactory import PloneUser
 
@@ -16,6 +17,14 @@ class DummyGroup(object):
 
     def Title(self):
         return self.title
+
+
+class DummyPlugin(Implicit):
+    def __init__(self, groups=None):
+        self.groups = groups
+
+    def getGroupIds(self):
+        return self.groups
 
 
 class GroupAdapterUnitTestCase(unittest.TestCase):
@@ -229,3 +238,40 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
     def test_canWriteProperty(self):
         adapter = self._makeAdapter()
         self.assertFalse(adapter.canWriteProperty("title"))
+
+    def test_group_id_in_plugin(self):
+        # This method uses the acquisition parent, which should be the plugin.
+        adapter = self._makeAdapter()
+        plugin = DummyPlugin(groups=["group1", "group2"])
+        adapter.__parent__ = plugin
+        self.assertTrue(adapter._group_id_in_plugin("group1"))
+        self.assertTrue(adapter._group_id_in_plugin("group2"))
+        self.assertFalse(adapter._group_id_in_plugin("other"))
+
+    def test_canAddToGroup(self):
+        adapter = self._makeAdapter()
+        plugin = DummyPlugin(groups=["group1", "group2"])
+        adapter.__parent__ = plugin
+        # We do not allow adding our group to another content group,
+        # because that should be done in the content.
+        # Adding to a standard Plone Group is fine,
+        # which is something the standard portal_groups tool can handle.
+        self.assertFalse(adapter.canAddToGroup("group1"))
+        self.assertFalse(adapter.canAddToGroup("group2"))
+        self.assertTrue(adapter.canAddToGroup("other"))
+
+    def test_canRemoveFromGroup(self):
+        adapter = self._makeAdapter()
+        plugin = DummyPlugin(groups=["group1", "group2"])
+        adapter.__parent__ = plugin
+        # We do not allow removing our group from another content group,
+        # because that should be done in the content.
+        # Removing from a standard Plone Group is fine,
+        # which is something the standard portal_groups tool can handle.
+        self.assertFalse(adapter.canRemoveFromGroup("group1"))
+        self.assertFalse(adapter.canRemoveFromGroup("group2"))
+        self.assertTrue(adapter.canRemoveFromGroup("other"))
+
+    def test_canAssignRole(self):
+        adapter = self._makeAdapter()
+        self.assertFalse(adapter.canAssignRole("Reader"))
