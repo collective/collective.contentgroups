@@ -78,9 +78,7 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
 
     def test_getDomains(self):
         adapter = self._makeAdapter()
-        with self.assertRaises(NotImplementedError):
-            # This may change, but for now this seems unneeded.
-            adapter.getDomains()
+        self.assertListEqual(adapter.getDomains(), [])
 
     def test_getGroups(self):
         adapter = self._makeAdapter()

@@ -105,8 +105,17 @@ class GroupAdapter(BasicUser):
         return list(self._roles)
 
     def getDomains(self):
-        """Return the list of domain restrictions for a user."""
-        raise NotImplementedError
+        """Return the list of domain restrictions for a user.
+
+        This is only really used in OFS.users.BasicUser.authenticate.
+        If getDomains returns a result, it does an extra check
+        domainSpecMatch(domains, request) to see if the user is allowed
+        to authenticate on this domain.
+        The 'authenticate' method won't actually get called for groups.
+
+        So anyway, it is safe to return an empty list.
+        """
+        return []
 
     def getGroups(self):
         """Return the groups the user is in.
