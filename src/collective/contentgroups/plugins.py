@@ -44,7 +44,7 @@ class ContentGroupsPlugin(BasePlugin):
         o If 'exact_match' is False, then 'id' may be treated by
           the plugin as "contains" searches (more complicated searches
           may be supported by some plugins using other keyword arguments).
-          TODO: not supported yet
+          Note: not supported yet
 
         o If 'sort_by' is passed, the results will be sorted accordingly.
           known valid values are 'id' (some plugins may support others).
@@ -108,8 +108,6 @@ class ContentGroupsPlugin(BasePlugin):
 
         o May assign groups based on values in the REQUEST object, if present
         """
-        # TODO It may be nice for performance to store this somewhere, probably a BTree in a utility,
-        # much like the redirection tool.
         groups = api.content.find(object_provides=IGroupMarker)
         principal_id = principal.getId()
         found = []
@@ -156,7 +154,8 @@ class ContentGroupsPlugin(BasePlugin):
                 group._addRoles(roles)
         group._addRoles(["Authenticated"])
 
-        # TODO: should we fill _groups as well?  PloneGroup does not do this.
+        # PloneGroup does not fill _groups, but it seems a good idea to do it.
+        # Then we calculate it only once here, instead of possibly multiple times.
         groups = pas._getGroupsForPrincipal(group, request, plugins=plugins)
         if groups:
             group._addGroups(groups)

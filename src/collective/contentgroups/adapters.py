@@ -16,7 +16,6 @@ class GroupAdapter(BasicUser):
     edit form of the Group itself.
     """
 
-    # TODO check security.
     security = ClassSecurityInfo()
 
     def __init__(self, group):
@@ -173,8 +172,8 @@ class GroupAdapter(BasicUser):
 
     def getGroupMembers(self):
         """Return a list of the portal_memberdata-ish members of the group."""
-        # TODO: the memberdata-ish part is the problem.
-        # But we may copy some code from PlonePAS.
+        # The memberdata-ish part is the problem.
+        # We could copy some code from PlonePAS.  Let's come back to this later.
         raise NotImplementedError
 
     def getAllGroupMembers(self):
