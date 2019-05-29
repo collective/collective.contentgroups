@@ -102,7 +102,7 @@ class GroupAdapter(BasicUser):
         The roles should have been added in plugins.py in getGroupById
         by calling group._addRoles.
         """
-        return list(self._roles)
+        return sorted(self._roles)
 
     def getDomains(self):
         """Return the list of domain restrictions for a user.
@@ -123,7 +123,7 @@ class GroupAdapter(BasicUser):
         This does not seem to be in any interface.
         But PropertiedUser has it, and RecursiveGroupsPlugin calls it.
         """
-        return list(self._groups)
+        return sorted(self._groups)
 
     # PropertiedUser defines methods to allow user folder plugins to annotate the user.
 
@@ -132,14 +132,16 @@ class GroupAdapter(BasicUser):
 
         o Don't complain about duplicates.
         """
-        self._groups.update(set(groups))
+        if groups:
+            self._groups.update(set(groups))
 
     def _addRoles(self, roles=()):
         """Extend our set of roles.
 
         o Don't complain about duplicates.
         """
-        self._roles.update(set(roles))
+        if roles:
+            self._roles.update(set(roles))
 
     # IGroupData
 

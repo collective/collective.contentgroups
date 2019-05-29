@@ -83,3 +83,47 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
     def test_getGroups(self):
         adapter = self._makeAdapter()
         self.assertListEqual(adapter.getGroups(), [])
+
+    def test_addGroups(self):
+        adapter = self._makeAdapter()
+        self.assertListEqual(adapter.getGroups(), [])
+        adapter._addGroups([])
+        self.assertListEqual(adapter.getGroups(), [])
+        # list is good
+        adapter._addGroups(["birds"])
+        self.assertListEqual(adapter.getGroups(), ["birds"])
+        # tuple is good
+        adapter._addGroups(("pelicans", "penguins"))
+        self.assertListEqual(adapter.getGroups(), ["birds", "pelicans", "penguins"])
+        # set is good
+        adapter._addGroups(set(["eagles"]))
+        self.assertListEqual(
+            adapter.getGroups(), ["birds", "eagles", "pelicans", "penguins"]
+        )
+        # duplicates are fine
+        adapter._addGroups(("birds", "penguins", "eagles"))
+        self.assertListEqual(
+            adapter.getGroups(), ["birds", "eagles", "pelicans", "penguins"]
+        )
+
+    def test_addRoles(self):
+        adapter = self._makeAdapter()
+        self.assertListEqual(adapter.getRoles(), [])
+        adapter._addRoles([])
+        self.assertListEqual(adapter.getRoles(), [])
+        # list is good
+        adapter._addRoles(["Editor"])
+        self.assertListEqual(adapter.getRoles(), ["Editor"])
+        # tuple is good
+        adapter._addRoles(("cook", "Manager"))
+        self.assertListEqual(adapter.getRoles(), ["Editor", "Manager", "cook"])
+        # set is good
+        adapter._addRoles(set(["foodie"]))
+        self.assertListEqual(
+            adapter.getRoles(), ["Editor", "Manager", "cook", "foodie"]
+        )
+        # duplicates are fine
+        adapter._addRoles(("cook", "Editor"))
+        self.assertListEqual(
+            adapter.getRoles(), ["Editor", "Manager", "cook", "foodie"]
+        )
