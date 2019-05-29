@@ -17,8 +17,8 @@ class DummyGroup(object):
         return self.title
 
 
-class BaseGroupAdapterTestCase(unittest.TestCase):
-    """Base test case class with a few helper methods."""
+class GroupAdapterUnitTestCase(unittest.TestCase):
+    """Test our GroupAdapter without Plone integration, using a dummy group."""
 
     def _makeGroup(self, groupid="group1"):
         return DummyGroup(groupid)
@@ -61,3 +61,29 @@ class BaseGroupAdapterTestCase(unittest.TestCase):
         adapter = self._makeAdapter()
         context = object()
         self.assertEqual(adapter.allowed(context), 0)
+
+    def test_isGroup(self):
+        adapter = self._makeAdapter()
+        self.assertTrue(adapter.isGroup())
+
+    def test_getUserId(self):
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getUserId(), "group1")
+
+    def test_getUserName(self):
+        adapter = self._makeAdapter()
+        self.assertEqual(adapter.getUserName(), "group1")
+
+    def test_getUserRoles(self):
+        adapter = self._makeAdapter()
+        self.assertDictEqual(adapter.getRoles(), {})
+
+    def test_getDomains(self):
+        adapter = self._makeAdapter()
+        with self.assertRaises(NotImplementedError):
+            # This may change, but for now this seems unneeded.
+            adapter.getDomains()
+
+    def test_getGroups(self):
+        adapter = self._makeAdapter()
+        self.assertListEqual(adapter.getGroups(), [])

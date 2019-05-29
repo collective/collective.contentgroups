@@ -78,8 +78,7 @@ class GroupAdapter(BasicUser):
 
     @security.public
     def getUserId(self):
-        """Get user's or group's name.
-        This is the id. PAS doesn't do prefixes and such like GRUF.
+        """Get user's or group's name. This is the id.
         """
         return self.getId()
 
