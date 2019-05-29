@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collective.contentgroups.config import PLUGIN_ID
 from collective.contentgroups.adapters import GroupAdapter
 from Products.PlonePAS.plugins.ufactory import PloneUser
 
@@ -7,7 +6,6 @@ import unittest
 
 
 class DummyGroup(object):
-
     def __init__(self, id, title=None, users=""):
         self.id = id
         self.title = title or id.capitalize()

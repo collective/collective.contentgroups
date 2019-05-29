@@ -278,4 +278,5 @@ class GroupAdapter(BasicUser):
         """True if group can be assigned role. Role id is string."""
         return False
 
+
 InitializeClass(GroupAdapter)

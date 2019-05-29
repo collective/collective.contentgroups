@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from collective.contentgroups.config import PLUGIN_ID
 from collective.contentgroups import testing
+from collective.contentgroups.config import PLUGIN_ID
 from Products.PlonePAS.plugins.ufactory import PloneUser
 
 import unittest
