@@ -156,3 +156,16 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
     def test_getGroupName(self):
         adapter = self._makeAdapter()
         self.assertEqual(adapter.getGroupName(), "group1")
+
+    def test_getGroupMembers_empty(self):
+        # Note: we cannot test this with a group that has users,
+        # because then we need the portal, which is not available in this test case.
+        # We need an integration test for that.
+        adapter = self._makeAdapter()
+        self.assertListEqual(adapter.getGroupMembers(), [])
+
+    def test_getAllGroupMembers_empty(self):
+        # Same remark as in test_getGroupMembers_empty:
+        # we can only test this with an empty group in this test case
+        adapter = self._makeAdapter()
+        self.assertListEqual(adapter.getAllGroupMembers(), [])

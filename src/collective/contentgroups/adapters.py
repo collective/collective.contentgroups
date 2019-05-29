@@ -3,6 +3,12 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from AccessControl.users import BasicUser
 from Acquisition import aq_parent
+from plone import api
+
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class GroupAdapter(BasicUser):
@@ -182,14 +188,36 @@ class GroupAdapter(BasicUser):
 
     def getGroupMembers(self):
         """Return a list of the portal_memberdata-ish members of the group."""
+        if not self._userids:
+            return []
         # The memberdata-ish part is the problem.
-        # We could copy some code from PlonePAS.  Let's come back to this later.
-        raise NotImplementedError
+        # Following code adapted from Products.PlonePAS.tools.groupdata.GroupData.
+        pas = api.portal.get_tool("acl_users")
+        md = api.portal.get_tool("portal_memberdata")
+        ret = []
+        for u_name in self._userids:
+            usr = pas.getUserById(u_name)
+            # getUserById is from PluggableAuthService, so not yet wrapped.
+            if usr:
+                ret.append(md.wrapUser(usr))
+                continue
+            # No user found, may be a group.
+            usr = pas.getGroupById(u_name)
+            # getGroupById is from PlonePAS, and is already wrapped.
+            if not usr:
+                logger.debug(
+                    "Group has a non-existing principal %s", u_name
+                )
+                continue
+            ret.append(usr)
+        return ret
 
     def getAllGroupMembers(self):
         """Return a list of the portal_memberdata-ish members of the group
         including transitive ones (ie. users or groups of a group in that
         group)."""
+        if not self._userids:
+            return []
         raise NotImplementedError
 
     def getGroupMemberIds(self):
