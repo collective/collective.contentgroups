@@ -74,7 +74,7 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
 
     def test_getUserRoles(self):
         adapter = self._makeAdapter()
-        self.assertDictEqual(adapter.getRoles(), {})
+        self.assertListEqual(adapter.getRoles(), [])
 
     def test_getDomains(self):
         adapter = self._makeAdapter()
