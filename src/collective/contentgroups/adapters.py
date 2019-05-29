@@ -156,6 +156,9 @@ class GroupAdapter(BasicUser):
 
         Properties can be given either as a dict or a keyword parameters list.
         """
+        if not (properties or kw):
+            # Do not bother complaining.
+            return
         raise NotImplementedError
 
     def getProperty(self, id, default=None):
@@ -205,9 +208,7 @@ class GroupAdapter(BasicUser):
             usr = pas.getGroupById(u_name)
             # getGroupById is from PlonePAS, and is already wrapped.
             if not usr:
-                logger.debug(
-                    "Group has a non-existing principal %s", u_name
-                )
+                logger.debug("Group has a non-existing principal %s", u_name)
                 continue
             ret.append(usr)
         return ret
@@ -231,18 +232,15 @@ class GroupAdapter(BasicUser):
         raise NotImplementedError
 
     def addMember(self, id):
-        """ Add the existing member with the given id to the group"""
+        """Add the existing member with the given id to the group."""
         raise NotImplementedError
 
     def removeMember(self, id):
-        """ Remove the member with the provided id from the group """
+        """Remove the member with the provided id from the group."""
         raise NotImplementedError
 
     def getGroup(self):
-        """ Returns the actual group implementation.
-
-        Varies by group implementation (GRUF/Nux/et al).
-        """
+        """Returns the actual group implementation."""
         return self.group
 
     def getGroupTitleOrName(self):
