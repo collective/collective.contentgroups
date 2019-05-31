@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collective.contentgroups import testing
+from collective.contentgroups.adapters import GroupAdapter
 from collective.contentgroups.config import PLUGIN_ID
+from plone import api
 from Products.PlonePAS.plugins.ufactory import PloneUser
 
 import unittest
@@ -64,4 +66,69 @@ class PluginWithGroupsTestCase(unittest.TestCase):
                 {"id": "sub2a", "pluginid": "contentgroups", "title": "Sub Content 2A"},
                 {"id": "sub2b", "pluginid": "contentgroups", "title": "Sub Content 2B"},
             ),
+        )
+
+    def test_get_single_group_brain(self):
+        self.assertEqual(
+            self.plugin._get_single_group_brain("content1").getPath(), "/plone/content1"
+        )
+        self.assertEqual(
+            self.plugin._get_single_group_brain("sub2a").getPath(), "/plone/sub2a"
+        )
+
+    def test_getGroupsForPrincipal(self):
+        # Note that our plugin only reports on content groups, not standard groups.
+        self.assertTupleEqual(
+            self.plugin.getGroupsForPrincipal(api.user.get("casual-ann")), ()
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupsForPrincipal(api.user.get("content1-corey")),
+            ("content1",),
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupsForPrincipal(api.user.get("sub2a-eddy")), ("sub2a",)
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupsForPrincipal(api.user.get("general")),
+            ("content1", "content2", "sub2a", "sub2b"),
+        )
+
+    def test_getGroupById(self):
+        self.assertIsNone(self.plugin.getGroupById("casual"))
+        group = self.plugin.getGroupById("content1")
+        self.assertIsInstance(group, GroupAdapter)
+        self.assertEqual(group.getGroupId(), "content1")
+        group = self.plugin.getGroupById("sub2a")
+        self.assertIsInstance(group, GroupAdapter)
+        self.assertEqual(group.getGroupId(), "sub2a")
+
+    def test_getGroups(self):
+        groups = self.plugin.getGroups()
+        self.assertEqual(len(groups), 4)
+        ids = []
+        for group in groups:
+            self.assertIsInstance(group, GroupAdapter)
+            ids.append(group.getGroupId())
+        self.assertListEqual(ids, ["content1", "content2", "sub2a", "sub2b"])
+
+    def test_getGroupIds(self):
+        self.assertTupleEqual(
+            self.plugin.getGroupIds(), ("content1", "content2", "sub2a", "sub2b")
+        )
+
+    def test_getGroupMembers(self):
+        self.assertTupleEqual(self.plugin.getGroupMembers("casual"), ())
+        self.assertTupleEqual(self.plugin.getGroupMembers("subcasual"), ())
+        self.assertTupleEqual(
+            self.plugin.getGroupMembers("content1"), ("content1-corey", "general")
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupMembers("content2"),
+            ("content2-donna", "general", "sub2a", "sub2b"),
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupMembers("sub2a"), ("general", "sub2a-eddy")
+        )
+        self.assertTupleEqual(
+            self.plugin.getGroupMembers("sub2b"), ("general", "sub2b-fiona")
         )

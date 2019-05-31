@@ -188,7 +188,7 @@ class ContentGroupsPlugin(BasePlugin):
         if not users:
             return tuple()
         # This is (at least currently) a Text field.
-        return tuple(users.splitlines())
+        return tuple(sorted(filter(None, users.splitlines())))
 
 
 InitializeClass(ContentGroupsPlugin)

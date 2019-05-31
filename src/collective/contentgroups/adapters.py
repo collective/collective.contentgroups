@@ -32,7 +32,7 @@ class GroupAdapter(BasicUser):
         self._roles = set()
         users = self.group.users
         if users:
-            self._userids = list(filter(None, users.splitlines()))
+            self._userids = list(sorted(filter(None, users.splitlines())))
         else:
             self._userids = []
 
