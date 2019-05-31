@@ -5,6 +5,7 @@ from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 
 import collective.contentgroups
+import collective.contentgroups.tests
 
 
 class ContentGroupsLayer(PloneSandboxLayer):
@@ -13,9 +14,11 @@ class ContentGroupsLayer(PloneSandboxLayer):
         # The z3c.autoinclude feature is disabled in the Plone fixture base
         # layer.
         self.loadZCML(package=collective.contentgroups)
+        self.loadZCML(name='testing.zcml', package=collective.contentgroups.tests)
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "collective.contentgroups:default")
+        applyProfile(portal, "collective.contentgroups.tests:testing")
 
 
 COLLECTIVE_CONTENT_GROUPS_FIXTURE = ContentGroupsLayer()
