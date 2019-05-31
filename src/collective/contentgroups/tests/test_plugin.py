@@ -43,3 +43,25 @@ class PluginEmptyTestCase(unittest.TestCase):
 
     def test_getGroupMembers_empty(self):
         self.assertTupleEqual(self.plugin.getGroupMembers("who"), ())
+
+
+class PluginWithGroupsTestCase(unittest.TestCase):
+    """Test our plugin with groups."""
+
+    layer = testing.COLLECTIVE_CONTENT_GROUPS_CREATED_INTEGRATION_TESTING
+
+    def setUp(self):
+        """Custom shared utility setup for tests."""
+        self.portal = self.layer["portal"]
+        self.plugin = self.portal.acl_users[PLUGIN_ID]
+
+    def test_enumerateGroups(self):
+        self.assertTupleEqual(
+            self.plugin.enumerateGroups(),
+            (
+                {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
+                {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
+                {"id": "sub2a", "pluginid": "contentgroups", "title": "Sub Content 2A"},
+                {"id": "sub2b", "pluginid": "contentgroups", "title": "Sub Content 2B"},
+            ),
+        )
