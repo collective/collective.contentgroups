@@ -63,8 +63,37 @@ class PluginWithGroupsTestCase(unittest.TestCase):
             (
                 {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
                 {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
-                {"id": "sub2a", "pluginid": "contentgroups", "title": "Sub Content 2A"},
-                {"id": "sub2b", "pluginid": "contentgroups", "title": "Sub Content 2B"},
+                {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
+                {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
+            ),
+        )
+        # max_results is not passed to the plugin by PAS, but it is part of the interface,
+        # so let's test it
+        self.assertTupleEqual(
+            self.plugin.enumerateGroups(max_results=2),
+            (
+                {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
+                {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
+            ),
+        )
+        # sort_by is not passed to the plugin by PAS, but it is part of the interface,
+        # so let's test it
+        self.assertTupleEqual(
+            self.plugin.enumerateGroups(sort_by="title"),
+            (
+                {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
+                {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
+                {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
+                {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
+            ),
+        )
+        # Combine them
+        self.assertTupleEqual(
+            self.plugin.enumerateGroups(sort_by="title", max_results=3),
+            (
+                {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
+                {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
+                {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
             ),
         )
 

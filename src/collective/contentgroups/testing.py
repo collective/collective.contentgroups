@@ -76,11 +76,13 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
         content2 = api.content.create(
             container=portal, type="Group", id="content2", title="Content 2"
         )
+        # Create sub content groups.
+        # Note that ids and title are different so that we can test the sort order.
         sub2a = api.content.create(
-            container=portal, type="Group", id="sub2a", title="Sub Content 2A"
+            container=portal, type="Group", id="sub2a", title="2A Sub Content"
         )
         sub2b = api.content.create(
-            container=portal, type="Group", id="sub2b", title="Sub Content 2B"
+            container=portal, type="Group", id="sub2b", title="2B Sub Content"
         )
         logout()
         # Add the sub groups to their parent groups.

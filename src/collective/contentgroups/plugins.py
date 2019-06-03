@@ -73,13 +73,37 @@ class ContentGroupsPlugin(BasePlugin):
         o Insufficiently-specified criteria may have catastrophic
           scaling issues for some implementations.
         """
-        if sort_by:
-            logger.warning("Ignoring sort_by=%r argument to enumerateGroups.", sort_by)
-        if kw:
-            logger.warning("Ignoring keyword arguments %r to enumerateGroups.", kw)
         query = {"object_provides": IGroupMarker}
+        # Note that id could be a list or tuple of ids.
         if id:
             query["id"] = id
+        # With PAS.searchGroups(name="a") we get passed both title=a and name=a.
+        # If title is already in the kwargs, PAS does not override it.
+        # So let's search for title first.
+        title = kw.pop("title", None)
+        name = kw.pop("name", None)
+        if not title:
+            title = name
+        if title:
+            query["Title"] = title
+        if sort_by:
+            # We can only support sorting by title or id.
+            # Those are the only group-specific attributes that we pass back.
+            if sort_by in ("title", "Title", "sortable_title"):
+                query["sort_on"] = "sortable_title"
+            elif sort_by == "id":
+                query["sort_on"] = "id"
+        if max_results:
+            try:
+                max_results = int(max_results)
+            except ValueError:
+                pass
+            else:
+                # This is just a hint for the catalog.
+                query["b_size"] = max_results
+        if kw:
+            # Add all remaining keyword arguments to the query. Seems fine.
+            query.update(kw)
         groups = api.content.find(**query)
         results = []
         if max_results is not None:
