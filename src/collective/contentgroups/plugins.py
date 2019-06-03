@@ -37,17 +37,16 @@ class ContentGroupsPlugin(BasePlugin):
 
         o Return mappings for groups matching the given criteria.
 
-        o 'id' in combination with 'exact_match' true, will
-          return at most one mapping per supplied ID ('id'
+        o 'id' willreturn at most one mapping per supplied ID ('id'
           may be a sequence).
 
-        o If 'exact_match' is False, then 'id' may be treated by
-          the plugin as "contains" searches (more complicated searches
-          may be supported by some plugins using other keyword arguments).
-          Note: not supported yet
+        o exact_match=False in combination with an id search is meant to be treated by
+          the plugin as "contains" searches.  This is not supported by us.
+          So we ignore the exact_match argument.
+          Note that most searches in the UI are with title/name="Some name", not with id.
 
         o If 'sort_by' is passed, the results will be sorted accordingly.
-          known valid values are 'id' (some plugins may support others).
+          Valid values are 'id' or 'title' (or 'Title' or 'sortable_title' for the same effect.)
 
         o If 'max_results' is specified, it must be a positive integer,
           limiting the number of returned mappings.  If unspecified, the

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collective.contentgroups import testing
+from Products.PlonePAS.plugins.ufactory import PloneUser
 
 import unittest
 
@@ -13,6 +14,11 @@ class IntegrationTestCase(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
         self.pas = self.portal.acl_users
+
+    def _makeUser(self, userid="general"):
+        # Create a transient/temporary user (much like our GroupAdapter is transient/temporary).
+        # Note that the "general" user is a member of all our extra groups.
+        return PloneUser(userid)
 
     def test_searchGroups(self):
         # PAS.searchGroups looks for IGroupEnumerationPlugin plugins
@@ -42,3 +48,42 @@ class IntegrationTestCase(unittest.TestCase):
         self.assertEqual(len(groups), 3)
         ids = [g["groupid"] for g in groups]
         self.assertListEqual(ids, ["sub2a", "sub2b", "content1"])
+
+    def test_getGroupsForPrincipal(self):
+        # PAS._getGroupsForPrincipal looks for IGroupsPlugin plugins
+        # and calls_getGroupsForPrincipal on them with principal and request.
+        general = self._makeUser()
+        groups = self.pas._getGroupsForPrincipal(general)
+        # Apparently the auto_group AuthenticatedUsers is always in there.
+        self.assertListEqual(
+            sorted(groups),
+            [
+                "AuthenticatedUsers",
+                "casual",
+                "content1",
+                "content2",
+                "sub2a",
+                "sub2b",
+                "subcasual",
+            ],
+        )
+        self.assertListEqual(
+            sorted(self.pas._getGroupsForPrincipal(self._makeUser("casual-ann"))),
+            ["AuthenticatedUsers", "casual"],
+        )
+        self.assertListEqual(
+            sorted(self.pas._getGroupsForPrincipal(self._makeUser("content1-corey"))),
+            ["AuthenticatedUsers", "content1"],
+        )
+        # Bert is member of subcasual, which is sub group of casual.  Both non-content.
+        self.assertListEqual(
+            sorted(self.pas._getGroupsForPrincipal(self._makeUser("subcasual-bert"))),
+            ["AuthenticatedUsers", "casual", "subcasual"],
+        )
+        # Does this work for our content groups too?
+        # Eddy is a member of sub2a, and that is a sub group of content2.
+        self.assertListEqual(
+            sorted(self.pas._getGroupsForPrincipal(self._makeUser("sub2a-eddy"))),
+            ["AuthenticatedUsers", "content2", "sub2a"],
+        )
+        # TODO Nope, not yet.
