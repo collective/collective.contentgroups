@@ -64,7 +64,7 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
             adapter.getMemberIds(transitive=0), ["arthur", "betty", "subgroup"]
         )
         # With transitive=1 (the default), we should report members of sub groups too, but the standard PloneGroup does not support this,
-        # so we ignore it too.
+        # so we ignore it too.  The recursive_groups plugin handles this for all groups.
         self.assertListEqual(
             adapter.getMemberIds(transitive=1), ["arthur", "betty", "subgroup"]
         )

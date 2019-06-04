@@ -125,13 +125,14 @@ class PluginWithGroupsTestCase(unittest.TestCase):
             ("content1",),
         )
         # Eddy is directly in sub2a, and that is a sub group of content2.
+        # We could report content2 as group,
+        # but the PAS recursive_groups plugin handles recursive groups for us.
         self.assertTupleEqual(
-            self.plugin.getGroupsForPrincipal(api.user.get("sub2a-eddy")),
-            ("content2", "sub2a"),
+            self.plugin.getGroupsForPrincipal(api.user.get("sub2a-eddy")), ("sub2a",)
         )
         self.assertTupleEqual(
             self.plugin.getGroupsForPrincipal(api.user.get("general")),
-            ("content1", "content2", "content_sub_of_standard", "sub2a", "sub2b"),
+            ("content1", "content2", "sub2a", "sub2b", "content_sub_of_standard"),
         )
 
     def test_getGroupById(self):

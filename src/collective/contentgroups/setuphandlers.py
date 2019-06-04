@@ -50,6 +50,28 @@ def post_install(context):
     plugin.manage_activateInterfaces(activate)
     logger.info("Plugins activated.")
 
+    # Order some plugins to make sure our plugin is at the top.
+    # This is needed for IGroupsPlugin to put us above the recursive_groups plugin.
+    for info in plugins.listPluginTypeInfo():
+        interface_name = info["id"]
+        if interface_name != "IGroupsPlugin":
+            continue
+        iface = plugins._getInterfaceFromName(interface_name)
+        plugin_ids = plugins.listPluginIds(iface)
+        rec_id = "recursive_groups"
+        if rec_id in plugin_ids:
+            target_index = plugin_ids.index(rec_id)
+            moves = len(plugin_ids) - target_index - 1
+            for _move in range(moves):
+                plugins.movePluginsUp(iface, [PLUGIN_ID])
+            logger.info(
+                "Moved %s above the recursive groups plugin in %s.",
+                PLUGIN_ID,
+                interface_name,
+            )
+        # We only need to handle one interface, so we can break here.
+        break
+
 
 def uninstall(context):
     """Uninstall script

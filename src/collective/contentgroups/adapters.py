@@ -49,7 +49,9 @@ class GroupAdapter(BasicUser):
         With transitive=1, this should include transitive groups.
         But the standard PloneGroup from PlonePAS ignores this argument,
         so we ignore it too.
-        Maybe the PAS recursive_groups plugin automatically does this.
+        The PAS recursive_groups plugin automatically handles this for all groups,
+        at least for all plugins that are above it in the IGroupsPlugin interface.
+        In our setuphandlers.py we arrange that our plugin is indeed above it.
         """
         return self._userids
 

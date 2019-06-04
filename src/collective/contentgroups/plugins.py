@@ -2,7 +2,6 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from collective.contentgroups.interfaces import IGroupMarker
-from collective.contentgroups.utils import find_all_groups_for_principal_id
 from collective.contentgroups.utils import list_users
 from plone import api
 from Products.PlonePAS.interfaces import group as group_plugins
@@ -135,21 +134,19 @@ class ContentGroupsPlugin(BasePlugin):
         """
         groups = api.content.find(object_provides=IGroupMarker)
         principal_id = principal.getId()
-        # Create a mapping from group ids to users,
-        # because we may find a sub content group and need to return its parent too.
-        # Note: for performance it would be nice to store this in a utility with a BTree.
-        mapping = {}
+        # We could use try to find groups recursively. So if user A belongs to sub content group S
+        # and S belongs to content group G, we could report S and G as groups.
+        # See utils.find_all_groups_for_principal_id in the git history.
+        # But actually, if the PAS recursive_groups plugin is below us in the IGroupsPlugin
+        # interface list, that plugin handles this for us.
+        found = []
         for group in groups:
             obj = group.getObject()
             users = list_users(obj)
             if not users:
                 continue
-            mapping[obj.id] = users
-        found = find_all_groups_for_principal_id(mapping, principal_id)
-        if found:
-            logger.info(
-                "getGroupsForPrincipal for {0} returned: {1}".format(principal, found)
-            )
+            if principal_id in users:
+                found.append(obj.id)
         return tuple(found)
 
     # Start of IGroupIntrospection
