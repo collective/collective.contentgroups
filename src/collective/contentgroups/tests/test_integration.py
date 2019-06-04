@@ -34,10 +34,13 @@ class IntegrationTestCase(unittest.TestCase):
         self.assertEqual(len(self.pas.searchGroups(max_results=5)), 6)
         # Searching for name returns anything with content in the title,
         # so also our sub groups with 'Sub Content' in the title.
-        self.assertEqual(len(self.pas.searchGroups(name="content")), 4)
-        self.assertEqual(len(self.pas.searchGroups(name="sub content")), 2)
-        # id is pickier:
-        self.assertEqual(len(self.pas.searchGroups(id="content")), 0)
+        self.assertEqual(len(self.pas.searchGroups(name="content")), 6)
+        self.assertEqual(len(self.pas.searchGroups(name="sub content")), 3)
+        # id is pickier.  Well, PlonePAS source_groups finds one that contains 'content'.
+        content = self.pas.searchGroups(id="content")
+        self.assertEqual(len(content), 1)
+        self.assertEqual(content[0]["id"], "standard_sub_of_content")
+        self.assertEqual(content[0]["pluginid"], "source_groups")
         self.assertEqual(len(self.pas.searchGroups(id="content1")), 1)
         self.assertEqual(len(self.pas.searchGroups(id="Content1")), 0)
         # We can have multiple ids though:
@@ -62,6 +65,8 @@ class IntegrationTestCase(unittest.TestCase):
                 "casual",
                 "content1",
                 "content2",
+                "content_sub_of_standard",
+                "standard_sub_of_content",
                 "sub2a",
                 "sub2b",
                 "subcasual",
@@ -75,6 +80,22 @@ class IntegrationTestCase(unittest.TestCase):
             sorted(self.pas._getGroupsForPrincipal(self._makeUser("content1-corey"))),
             ["AuthenticatedUsers", "content1"],
         )
+        # We have one user who is member of all sub groups.  Do the parent groups get reported properly?
+        self.assertListEqual(
+            sorted(self.pas._getGroupsForPrincipal(self._makeUser("sub"))),
+            [
+                "AuthenticatedUsers",
+                "casual",
+                "content1",
+                "content2",
+                "content_sub_of_standard",
+                "standard_sub_of_content",
+                "sub2a",
+                "sub2b",
+                "subcasual",
+            ],
+        )
+
         # Bert is member of subcasual, which is sub group of casual.  Both non-content.
         self.assertListEqual(
             sorted(self.pas._getGroupsForPrincipal(self._makeUser("subcasual-bert"))),
@@ -86,4 +107,3 @@ class IntegrationTestCase(unittest.TestCase):
             sorted(self.pas._getGroupsForPrincipal(self._makeUser("sub2a-eddy"))),
             ["AuthenticatedUsers", "content2", "sub2a"],
         )
-        # TODO Nope, not yet.

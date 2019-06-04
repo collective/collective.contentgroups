@@ -3,6 +3,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from AccessControl.users import BasicUser
 from Acquisition import aq_parent
+from collective.contentgroups.utils import list_users
 from plone import api
 
 import logging
@@ -30,11 +31,7 @@ class GroupAdapter(BasicUser):
         self._title = self.group.Title() or group.id
         self._groups = set()
         self._roles = set()
-        users = self.group.users
-        if users:
-            self._userids = list(sorted(filter(None, users.splitlines())))
-        else:
-            self._userids = []
+        self._userids = list_users(self.group)
 
     # from Products.PlonePAS.plugins.group.PloneGroup:
 

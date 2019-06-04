@@ -84,12 +84,28 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
         sub2b = api.content.create(
             container=portal, type="Group", id="sub2b", title="2B Sub Content"
         )
+        content_sub_of_standard = api.content.create(
+            container=portal,
+            type="Group",
+            id="content_sub_of_standard",
+            title="Content Sub of Standard",
+        )
+        content_sub_of_standard.users = ""
         logout()
         # Add the sub groups to their parent groups.
         api.group.add_user(group=casual, user=subcasual)
         # Ah, yes, we don't support this for content groups, because you have to go
         # through the content UI
         content2.users = "sub2a\nsub2b"
+        # Let's also create a standard sub group in a content group:
+        standard_sub_of_content = api.group.create(
+            groupname="standard_sub_of_content",
+            title="Standard Sub of Content 1",
+            roles=["Reader"],
+        )
+        content1.users = "standard_sub_of_content"
+        # and a content sub group in a standard group.
+        api.group.add_user(group=casual, user=content_sub_of_standard)
         # Create some standard users and add them to groups.
         ann = api.user.create(
             email="ann@example.org",
@@ -111,7 +127,7 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
             password="secret",
             properties={"title": "Corey Content 1"},
         )
-        content1.users = corey.getUserId()
+        content1.users += "\n{0}".format(corey.getUserId())
         donna = api.user.create(
             email="donna@example.org",
             username="content2-donna",
@@ -140,10 +156,21 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
             password="secret",
             properties={"title": "General"},
         )
-        for group in (casual, subcasual):
+        for group in (casual, subcasual, standard_sub_of_content):
             api.group.add_user(group=group, user=general)
-        for group in (content1, content2, sub2a, sub2b):
+        for group in (content1, content2, sub2a, sub2b, content_sub_of_standard):
             group.users += "\n{0}".format(general.getUserId())
+        # Add one user who is in all SUB groups.
+        sub = api.user.create(
+            email="sub@example.org",
+            username="sub",
+            password="secret",
+            properties={"title": "Sub"},
+        )
+        for group in (subcasual, standard_sub_of_content):
+            api.group.add_user(group=group, user=sub)
+        for group in (sub2a, sub2b, content_sub_of_standard):
+            group.users += "\n{0}".format(sub.getUserId())
 
 
 COLLECTIVE_CONTENT_GROUPS_CREATED_FIXTURE = ContentGroupsCreatedLayer()

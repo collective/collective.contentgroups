@@ -2,6 +2,8 @@
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from collective.contentgroups.interfaces import IGroupMarker
+from collective.contentgroups.utils import find_all_groups_for_principal_id
+from collective.contentgroups.utils import list_users
 from plone import api
 from Products.PlonePAS.interfaces import group as group_plugins
 from Products.PluggableAuthService.interfaces import plugins as pas_plugins
@@ -85,13 +87,13 @@ class ContentGroupsPlugin(BasePlugin):
             title = name
         if title:
             query["Title"] = title
-        if sort_by:
-            # We can only support sorting by title or id.
-            # Those are the only group-specific attributes that we pass back.
-            if sort_by in ("title", "Title", "sortable_title"):
-                query["sort_on"] = "sortable_title"
-            elif sort_by == "id":
-                query["sort_on"] = "id"
+        # We can only support sorting by title or id.
+        # Those are the only group-specific attributes that we pass back.
+        # And actually it seems a good idea to always sort.
+        if sort_by and sort_by in ("title", "Title", "sortable_title"):
+            query["sort_on"] = "sortable_title"
+        else:
+            query["sort_on"] = "id"
         if max_results:
             try:
                 max_results = int(max_results)
@@ -133,13 +135,17 @@ class ContentGroupsPlugin(BasePlugin):
         """
         groups = api.content.find(object_provides=IGroupMarker)
         principal_id = principal.getId()
-        found = []
+        # Create a mapping from group ids to users,
+        # because we may find a sub content group and need to return its parent too.
+        # Note: for performance it would be nice to store this in a utility with a BTree.
+        mapping = {}
         for group in groups:
             obj = group.getObject()
-            if not obj.users:
+            users = list_users(obj)
+            if not users:
                 continue
-            if principal_id in obj.users.splitlines():
-                found.append(obj.id)
+            mapping[obj.id] = users
+        found = find_all_groups_for_principal_id(mapping, principal_id)
         if found:
             logger.info(
                 "getGroupsForPrincipal for {0} returned: {1}".format(principal, found)
@@ -207,11 +213,7 @@ class ContentGroupsPlugin(BasePlugin):
         group = self._get_single_group_brain(group_id)
         if not group:
             return tuple()
-        users = group.getObject().users
-        if not users:
-            return tuple()
-        # This is (at least currently) a Text field.
-        return tuple(sorted(filter(None, users.splitlines())))
+        return tuple(list_users(group.getObject()))
 
 
 InitializeClass(ContentGroupsPlugin)

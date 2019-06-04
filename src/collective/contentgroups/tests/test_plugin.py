@@ -63,6 +63,11 @@ class PluginWithGroupsTestCase(unittest.TestCase):
             (
                 {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
                 {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
+                {
+                    "id": "content_sub_of_standard",
+                    "pluginid": "contentgroups",
+                    "title": "Content Sub of Standard",
+                },
                 {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
                 {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
             ),
@@ -85,6 +90,11 @@ class PluginWithGroupsTestCase(unittest.TestCase):
                 {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
                 {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
                 {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
+                {
+                    "id": "content_sub_of_standard",
+                    "pluginid": "contentgroups",
+                    "title": "Content Sub of Standard",
+                },
             ),
         )
         # Combine them
@@ -114,12 +124,14 @@ class PluginWithGroupsTestCase(unittest.TestCase):
             self.plugin.getGroupsForPrincipal(api.user.get("content1-corey")),
             ("content1",),
         )
+        # Eddy is directly in sub2a, and that is a sub group of content2.
         self.assertTupleEqual(
-            self.plugin.getGroupsForPrincipal(api.user.get("sub2a-eddy")), ("sub2a",)
+            self.plugin.getGroupsForPrincipal(api.user.get("sub2a-eddy")),
+            ("content2", "sub2a"),
         )
         self.assertTupleEqual(
             self.plugin.getGroupsForPrincipal(api.user.get("general")),
-            ("content1", "content2", "sub2a", "sub2b"),
+            ("content1", "content2", "content_sub_of_standard", "sub2a", "sub2b"),
         )
 
     def test_getGroupById(self):
@@ -133,31 +145,35 @@ class PluginWithGroupsTestCase(unittest.TestCase):
 
     def test_getGroups(self):
         groups = self.plugin.getGroups()
-        self.assertEqual(len(groups), 4)
+        self.assertEqual(len(groups), 5)
         ids = []
         for group in groups:
             self.assertIsInstance(group, GroupAdapter)
             ids.append(group.getGroupId())
-        self.assertListEqual(ids, ["content1", "content2", "sub2a", "sub2b"])
+        self.assertListEqual(
+            ids, ["content1", "content2", "content_sub_of_standard", "sub2a", "sub2b"]
+        )
 
     def test_getGroupIds(self):
         self.assertTupleEqual(
-            self.plugin.getGroupIds(), ("content1", "content2", "sub2a", "sub2b")
+            self.plugin.getGroupIds(),
+            ("content1", "content2", "content_sub_of_standard", "sub2a", "sub2b"),
         )
 
     def test_getGroupMembers(self):
         self.assertTupleEqual(self.plugin.getGroupMembers("casual"), ())
         self.assertTupleEqual(self.plugin.getGroupMembers("subcasual"), ())
         self.assertTupleEqual(
-            self.plugin.getGroupMembers("content1"), ("content1-corey", "general")
+            self.plugin.getGroupMembers("content1"),
+            ("content1-corey", "general", "standard_sub_of_content"),
         )
         self.assertTupleEqual(
             self.plugin.getGroupMembers("content2"),
             ("content2-donna", "general", "sub2a", "sub2b"),
         )
         self.assertTupleEqual(
-            self.plugin.getGroupMembers("sub2a"), ("general", "sub2a-eddy")
+            self.plugin.getGroupMembers("sub2a"), ("general", "sub", "sub2a-eddy")
         )
         self.assertTupleEqual(
-            self.plugin.getGroupMembers("sub2b"), ("general", "sub2b-fiona")
+            self.plugin.getGroupMembers("sub2b"), ("general", "sub", "sub2b-fiona")
         )
