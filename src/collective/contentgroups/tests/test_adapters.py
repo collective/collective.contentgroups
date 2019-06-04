@@ -48,19 +48,26 @@ class GroupAdapterUnitTestCase(unittest.TestCase):
 
     def test_getMemberIds_empty(self):
         adapter = self._makeAdapter()
-        with self.assertRaises(NotImplementedError):
-            # default argument transitive=1 is not supported for now
-            adapter.getMemberIds()
+        # default argument transitive=1 is actually ignored.
+        self.assertListEqual(adapter.getMemberIds(), [])
         self.assertListEqual(adapter.getMemberIds(transitive=0), [])
 
     def test_getMemberIds_filled(self):
+        subgroup = self._makeGroup(groupid="subgroup")
+        subgroup.users = "steve\nsusy"
         group = self._makeGroup()
-        group.users = "arthur\n\n\nbetty"
+        group.users = "arthur\n\n\nbetty\nsubgroup"
+        subadapter = self._makeAdapter(subgroup)
         adapter = self._makeAdapter(group)
-        with self.assertRaises(NotImplementedError):
-            # default argument transitive=1 is not supported for now
-            adapter.getMemberIds()
-        self.assertListEqual(adapter.getMemberIds(transitive=0), ["arthur", "betty"])
+        self.assertListEqual(subadapter.getMemberIds(), ["steve", "susy"])
+        self.assertListEqual(
+            adapter.getMemberIds(transitive=0), ["arthur", "betty", "subgroup"]
+        )
+        # With transitive=1 (the default), we should report members of sub groups too, but the standard PloneGroup does not support this,
+        # so we ignore it too.
+        self.assertListEqual(
+            adapter.getMemberIds(transitive=1), ["arthur", "betty", "subgroup"]
+        )
 
     def test_getRolesInContext(self):
         adapter = self._makeAdapter()

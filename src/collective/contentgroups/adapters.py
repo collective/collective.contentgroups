@@ -44,12 +44,13 @@ class GroupAdapter(BasicUser):
 
     @security.private
     def getMemberIds(self, transitive=1):
-        """Return member ids of this group, including or not
-        transitive groups.
+        """Return member ids of this group.
+
+        With transitive=1, this should include transitive groups.
+        But the standard PloneGroup from PlonePAS ignores this argument,
+        so we ignore it too.
+        Maybe the PAS recursive_groups plugin automatically does this.
         """
-        if transitive:
-            # not implemented for now.
-            raise NotImplementedError
         return self._userids
 
     @security.public
