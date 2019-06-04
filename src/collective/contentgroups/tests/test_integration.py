@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from collective.contentgroups import testing
+from plone import api
 from Products.PlonePAS.plugins.ufactory import PloneUser
 
 import unittest
 
 
 class IntegrationTestCase(unittest.TestCase):
-    """Test how our plugin integrated in PAS."""
+    """Test how our plugin is integrated in PAS."""
 
     layer = testing.COLLECTIVE_CONTENT_GROUPS_CREATED_INTEGRATION_TESTING
 
@@ -167,3 +168,27 @@ class IntegrationTestCase(unittest.TestCase):
         )
         self.assertEqual(content1.getGroupMemberIds(), content1.getAllGroupMemberIds())
         self.assertEqual(content2.getGroupMemberIds(), content2.getAllGroupMemberIds())
+
+    def test_duplicate_group_id_for_standard_groups_and_users(self):
+        # You shouldn't be able to add a Group with an id that already exists.
+        # While adding standard groups or users, this is already checked.
+        # Note that there are similar tests in test_functional.py,
+        # where we try to create content.
+        len_users = len(api.user.get_users())
+        self.assertGreaterEqual(len_users, 9)
+        with self.assertRaises(ValueError):
+            api.user.create(email="x@example.org", username="content1")
+        self.assertEqual(len(api.user.get_users()), len_users)
+        # Check our logic: adding a unique user is allowed
+        api.user.create(email="unique@example.org", username="unique")
+        len_users += 1
+        self.assertEqual(len(api.user.get_users()), len_users)
+
+        # Strangely, creating a group with the same name silently fails,
+        # but gets you the current group.
+        len_groups = len(api.group.get_groups())
+        self.assertGreaterEqual(len_groups, 9)
+        api.group.create(groupname="casual")
+        api.group.create(groupname="content1")
+        # Check that no groups have been added:
+        self.assertEqual(len(api.group.get_groups()), len_groups)

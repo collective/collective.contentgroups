@@ -110,7 +110,12 @@ class ContentGroupsPlugin(BasePlugin):
             groups = groups[:max_results]
         for group in groups:
             results.append(
-                {"id": group.getId, "pluginid": self.getId(), "title": group.Title}
+                {
+                    "id": group.getId,
+                    "pluginid": self.getId(),
+                    "title": group.Title,
+                    "uid": group.UID,
+                }
             )
         return tuple(results)
 

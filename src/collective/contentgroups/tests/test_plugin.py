@@ -57,9 +57,17 @@ class PluginWithGroupsTestCase(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.plugin = self.portal.acl_users[PLUGIN_ID]
 
+    def _strip_uid(self, groups):
+        # enumerateGroups returns a uid, needed in subscribers.py,
+        # which is hard to compare, so we remove it here.
+        for group in groups:
+            # Pop the uid and check that it is not empty.
+            self.assertTrue(group.pop("uid"))
+        return groups
+
     def test_enumerateGroups(self):
         self.assertTupleEqual(
-            self.plugin.enumerateGroups(),
+            self._strip_uid(self.plugin.enumerateGroups()),
             (
                 {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
                 {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
@@ -75,7 +83,7 @@ class PluginWithGroupsTestCase(unittest.TestCase):
         # max_results is not passed to the plugin by PAS, but it is part of the interface,
         # so let's test it
         self.assertTupleEqual(
-            self.plugin.enumerateGroups(max_results=2),
+            self._strip_uid(self.plugin.enumerateGroups(max_results=2)),
             (
                 {"id": "content1", "pluginid": "contentgroups", "title": "Content 1"},
                 {"id": "content2", "pluginid": "contentgroups", "title": "Content 2"},
@@ -84,7 +92,7 @@ class PluginWithGroupsTestCase(unittest.TestCase):
         # sort_by is not passed to the plugin by PAS, but it is part of the interface,
         # so let's test it
         self.assertTupleEqual(
-            self.plugin.enumerateGroups(sort_by="title"),
+            self._strip_uid(self.plugin.enumerateGroups(sort_by="title")),
             (
                 {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
                 {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},
@@ -99,7 +107,9 @@ class PluginWithGroupsTestCase(unittest.TestCase):
         )
         # Combine them
         self.assertTupleEqual(
-            self.plugin.enumerateGroups(sort_by="title", max_results=3),
+            self._strip_uid(
+                self.plugin.enumerateGroups(sort_by="title", max_results=3)
+            ),
             (
                 {"id": "sub2a", "pluginid": "contentgroups", "title": "2A Sub Content"},
                 {"id": "sub2b", "pluginid": "contentgroups", "title": "2B Sub Content"},

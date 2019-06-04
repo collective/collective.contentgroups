@@ -37,10 +37,14 @@
       factory=".behavior.Group"
       marker=".interfaces.IGroupMarker"
       />
- <adapter
+  <adapter
       factory=".adapters.GroupAdapter"
       provides="Products.PlonePAS.interfaces.group.IGroupData"
       for=".interfaces.IGroupMarker"
       />
+  <subscriber
+      for=".interfaces.IGroupMarker
+           zope.lifecycleevent.interfaces.IObjectMovedEvent"
+      handler=".subscribers.added_group" />
 
 </configure>
