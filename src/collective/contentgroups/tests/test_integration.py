@@ -107,3 +107,63 @@ class IntegrationTestCase(unittest.TestCase):
             sorted(self.pas._getGroupsForPrincipal(self._makeUser("sub2a-eddy"))),
             ["AuthenticatedUsers", "content2", "sub2a"],
         )
+
+    def test_getGroupMembers_and_getGroupMembers(self):
+        # Do PloneGroup and our GroupAdapter handle these methods the same way?
+        standard = self.pas.getGroupById("casual")
+        content1 = self.pas.getGroupById("content1")
+        content2 = self.pas.getGroupById("content2")
+        self.assertEqual(
+            sorted([x.id for x in standard.getGroupMembers()]),
+            ["casual-ann", "content_sub_of_standard", "general", "subcasual"],
+        )
+        # Our group members are always sorted.
+        self.assertEqual(
+            [x.id for x in content1.getGroupMembers()],
+            ["content1-corey", "general", "standard_sub_of_content"],
+        )
+        self.assertEqual(
+            [x.id for x in content2.getGroupMembers()],
+            ["content2-donna", "general", "sub2a", "sub2b"],
+        )
+        # According to the documentation the getAllGroupMembers also returns users from sub groups,
+        # but in practice this does not happen.
+        self.assertEqual(
+            sorted([x.id for x in standard.getGroupMembers()]),
+            sorted([x.id for x in standard.getAllGroupMembers()]),
+        )
+        self.assertEqual(
+            [x.id for x in content1.getGroupMembers()],
+            [x.id for x in content1.getAllGroupMembers()],
+        )
+        self.assertEqual(
+            [x.id for x in content2.getGroupMembers()],
+            [x.id for x in content2.getAllGroupMembers()],
+        )
+
+    def test_getGroupMemberIds_and_getAllGroupMemberIds(self):
+        # Do PloneGroup and our GroupAdapter handle these methods the same way?
+        standard = self.pas.getGroupById("casual")
+        content1 = self.pas.getGroupById("content1")
+        content2 = self.pas.getGroupById("content2")
+        self.assertEqual(
+            sorted(standard.getGroupMemberIds()),
+            ["casual-ann", "content_sub_of_standard", "general", "subcasual"],
+        )
+        # Our group member ids are always sorted.
+        self.assertEqual(
+            content1.getGroupMemberIds(),
+            ["content1-corey", "general", "standard_sub_of_content"],
+        )
+        self.assertEqual(
+            content2.getGroupMemberIds(),
+            ["content2-donna", "general", "sub2a", "sub2b"],
+        )
+        # According to the documentation the getAllGroupMembers also returns users from sub groups,
+        # but in practice this does not happen.
+        self.assertEqual(
+            sorted(standard.getGroupMemberIds()),
+            sorted(standard.getAllGroupMemberIds()),
+        )
+        self.assertEqual(content1.getGroupMemberIds(), content1.getAllGroupMemberIds())
+        self.assertEqual(content2.getGroupMemberIds(), content2.getAllGroupMemberIds())

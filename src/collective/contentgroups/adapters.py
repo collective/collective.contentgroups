@@ -214,22 +214,26 @@ class GroupAdapter(BasicUser):
         return ret
 
     def getAllGroupMembers(self):
-        """Return a list of the portal_memberdata-ish members of the group
-        including transitive ones (ie. users or groups of a group in that
-        group)."""
-        if not self._userids:
-            return []
-        raise NotImplementedError
+        """Return a list of the portal_memberdata-ish members of the group.
+
+        According to the PloneGroup docstring this should include transitive ones
+        (ie. users or groups of a group in that group).  But that was never implemented.
+        So we do not do this either.
+        """
+        return self.getGroupMembers()
 
     def getGroupMemberIds(self):
         """Return a list of the user ids of the group."""
         return self._userids
 
     def getAllGroupMemberIds(self):
-        """ Return a list of the user ids of the group.
-        including transitive ones (ie. users or groups of a group in that
-        group)."""
-        raise NotImplementedError
+        """Return a list of the user ids of the group.
+
+        According to the PloneGroup docstring this should include transitive ones
+        (ie. users or groups of a group in that group).  But that was never implemented.
+        So we do not do this either.
+        """
+        return self.getGroupMemberIds()
 
     def addMember(self, id):
         """Add the existing member with the given id to the group."""
