@@ -38,7 +38,7 @@ class ContentGroupsPlugin(BasePlugin):
 
         o Return mappings for groups matching the given criteria.
 
-        o 'id' willreturn at most one mapping per supplied ID ('id'
+        o 'id' will return at most one mapping per supplied ID ('id'
           may be a sequence).
 
         o exact_match=False in combination with an id search is meant to be treated by
