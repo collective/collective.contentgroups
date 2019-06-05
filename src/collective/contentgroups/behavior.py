@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from AccessControl import ClassSecurityInfo
 from collective.contentgroups import _
 from collective.contentgroups.utils import list_users
 from plone.autoform.interfaces import IFormFieldProvider
@@ -26,6 +27,10 @@ class IGroup(model.Schema):
 @implementer(IGroup)
 @adapter(IDexterityContent)
 class Group(object):
+
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+
     def __init__(self, group):
         self.group = group
 

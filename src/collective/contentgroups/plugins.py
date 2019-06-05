@@ -21,6 +21,7 @@ class ContentGroupsPlugin(BasePlugin):
 
     meta_type = "ContentGroups Plugin"
     security = ClassSecurityInfo()
+    security.declareObjectPrivate()
 
     # Start of IGroupEnumerationPlugin
 

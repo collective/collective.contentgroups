@@ -24,6 +24,7 @@ class GroupAdapter(BasicUser):
     """
 
     security = ClassSecurityInfo()
+    security.declareObjectPrivate()
 
     def __init__(self, group):
         self.group = group
@@ -42,7 +43,6 @@ class GroupAdapter(BasicUser):
         """
         return self.id
 
-    @security.private
     def getMemberIds(self, transitive=1):
         """Return member ids of this group.
 
@@ -55,13 +55,11 @@ class GroupAdapter(BasicUser):
         """
         return self._userids
 
-    @security.public
     def getRolesInContext(self, object):
         """Since groups can't actually log in, do nothing.
         """
         return []
 
-    @security.public
     def allowed(self, object, object_roles=None):
         """Since groups can't actually log in, do nothing.
         """
@@ -69,19 +67,16 @@ class GroupAdapter(BasicUser):
 
     # from Products.PlonePAS.plugins.ufactory.PloneUser:
 
-    @security.public
     def isGroup(self):
         """Return 1/True if this user is a group abstraction."""
         return True
 
-    @security.public
     def getName(self):
         """Get user's or group's name.
         This is the id. PAS doesn't do prefixes and such like GRUF.
         """
         return self.getId()
 
-    @security.public
     def getUserId(self):
         """Get user's or group's name. This is the id.
         """
