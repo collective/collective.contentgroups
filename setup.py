@@ -32,14 +32,14 @@ setup(
     keywords="Python Plone",
     author="Maurits van Rees",
     author_email="m.van.rees@zestsoftware.nl",
-    url="https://zestsoftware.nl/",
+    url="https://github.com/collective/collective.contentgroups",
     license="GPL version 2",
     packages=find_packages("src", exclude=["ez_setup"]),
     namespace_packages=["collective"],
     package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    install_requires=["Products.GenericSetup>=1.8.2", "plone.api", "setuptools"],
+    install_requires=["Products.GenericSetup>=1.8.2", "plone.api", "setuptools", "six"],
     extras_require={
         "test": [
             "plone.app.testing",

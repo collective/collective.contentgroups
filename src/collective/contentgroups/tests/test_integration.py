@@ -6,6 +6,50 @@ from Products.PlonePAS.plugins.ufactory import PloneUser
 import unittest
 
 
+class BehaviorTestCase(unittest.TestCase):
+    """Test our behavior.
+
+    We test some minor things from the IGroup adapter / Group provider anyway.
+    You won't often directly use this.
+    """
+
+    layer = testing.COLLECTIVE_CONTENT_GROUPS_CREATED_INTEGRATION_TESTING
+
+    def setUp(self):
+        """Custom shared utility setup for tests."""
+        self.portal = self.layer["portal"]
+
+    def test_igroup(self):
+        from collective.contentgroups.behavior import IGroup
+
+        group = self.portal.content1
+        adapted = IGroup(group)
+        self.assertEqual(
+            group.users, "standard_sub_of_content\ncontent1-corey\ngeneral"
+        )
+        # The getter returns a sorted list.
+        self.assertEqual(
+            adapted.users, ["content1-corey", "general", "standard_sub_of_content"]
+        )
+        # Set it to the same, but with the sorted list as value.
+        adapted.users = adapted.users
+        self.assertEqual(
+            group.users, "content1-corey\ngeneral\nstandard_sub_of_content"
+        )
+        # Set to single string.
+        adapted.users = "pete"
+        self.assertEqual(group.users, "pete")
+        self.assertEqual(adapted.users, ["pete"])
+        # Set to stupid string
+        adapted.users = "\n\tfoobar   \n\n\n\r\n  ello  \n\n"
+        self.assertEqual(group.users, "ello\nfoobar")
+        self.assertEqual(adapted.users, ["ello", "foobar"])
+        # Set to integer, to see that we do not break easily.
+        adapted.users = 42
+        self.assertEqual(group.users, "42")
+        self.assertEqual(adapted.users, ["42"])
+
+
 class IntegrationTestCase(unittest.TestCase):
     """Test how our plugin is integrated in PAS."""
 

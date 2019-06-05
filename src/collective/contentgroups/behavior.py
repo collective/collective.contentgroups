@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from collective.contentgroups import _
+from collective.contentgroups.utils import list_users
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.dexterity.interfaces import IDexterityContent
 from plone.supermodel import model
-from Products.CMFPlone.utils import base_hasattr
+from six import string_types
 from zope import schema
 from zope.component import adapter
 from zope.interface import implementer
@@ -25,15 +26,20 @@ class IGroup(model.Schema):
 @implementer(IGroup)
 @adapter(IDexterityContent)
 class Group(object):
-    def __init__(self, context):
-        self.context = context
+    def __init__(self, group):
+        self.group = group
 
     @property
     def users(self):
-        if base_hasattr(self.context, "users"):
-            return self.context.users
-        return None
+        return list_users(self.group)
 
     @users.setter
     def users(self, value):
-        self.context.users = value
+        # First make sure we have a proper list.
+        if not isinstance(value, (list, tuple)):
+            if not isinstance(value, string_types):
+                value = str(value)
+            value = list_users(value)
+        # Then turn it into a string again.
+        value = "\n".join(filter(None, value))
+        self.group.users = value

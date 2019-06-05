@@ -28,3 +28,7 @@ class UtilsUnitTestCase(unittest.TestCase):
             list_users(self._makeGroup(users="\n  \r\n\tjoe\t\n\rjane\n")),
             ["jane", "joe"],
         )
+        # We support listing (and filtering and sorting) from a simple string too.
+        self.assertListEqual(list_users(""), [])
+        self.assertListEqual(list_users("pete"), ["pete"])
+        self.assertListEqual(list_users("\n  \r\n\tjoe\t\n\rjane\n"), ["jane", "joe"])
