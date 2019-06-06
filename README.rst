@@ -13,10 +13,14 @@ It supports content items as groups.
 Features
 --------
 
-- A behavior that makes a portal type a group.
-- A PAS plugin that integrates these groups.
+- A behavior ``collective.contentgroups.group`` that makes a portal type a group, with a simple ``users`` text field.
+- A PAS plugin ``contentgroups`` that integrates these groups.
+- An adapter ``GroupAdapter`` that gives content items with our behavior the needed functionality that the standard ``PloneGroup`` and ``GroupData`` objects provide.
 - An installer that installs the plugin into ``acl_users``.
 - An uninstaller to remove the plugin.
+
+Note: this package has no Group portal type.
+You will have to enable the behavior yourself on a new or existing dexterity portal type.
 
 
 Installation
@@ -32,9 +36,63 @@ Install collective.contentgroups by adding it to your buildout::
         collective.contentgroups
 
 
-and then running ``bin/buildout``.
+and then running ``bin/buildout`` and starting Plone.
 
-Install the product in the Add-ons control panel in Plone.
+Now you can install the product in the Add-ons control panel in Plone.
+Then go to the Dexterity contenttypes control panel.
+Either create a new type or edit an existing type and enable the Group behavior.
+
+
+Usage
+-----
+
+Creating groups
+~~~~~~~~~~~~~~~
+
+Any groups that you add in the Users and Groups control panel, are standard Plone groups.
+In the Content UI, you can create a group, just like you would create a Page or Folder.
+Use the Add New action menu and select the content type for which you have enabled the behavior.
+
+Deleting groups is also done in the content UI: simply delete the group like you would delete a Page.
+
+Note that if the group is private, a Site Adminstrator will see it in the Groups control panel.
+But other users may not see the group.
+Editors that have no permission to see the group, will not be able to select it in the Sharing tab.
+A member of the group may not effectively get the group membership, because the group is not found (in the ``portal_catalog`` search).
+
+In other words: setting a Group in the private state is an effective way to disable it.
+
+
+Adding users
+~~~~~~~~~~~~
+
+Adding users must be done on the edit form of the content group.
+It cannot be done in the Users and Groups control panel.
+In the Users text field, type the ids of users that you want in this group, one per line.
+
+Note: you need the id here, not the login name.
+Usually they are the same, but they may differ, for example when you use email as login.
+
+To remove a user from the group, simply remove its id from the Users field.
+
+In the Users and Groups control panel you will be able to see which users belong to a content group and to which content groups a user belongs.
+But you won't be able to change it.
+
+
+Adding roles
+~~~~~~~~~~~~
+
+You cannot add roles to groups, not in the edit form and not in the control panel.
+What you *can* do, is:
+
+- Add the content group to a standard Plone group and give that group a role.
+- Search and select the content group on the Sharing tab and give it a role.
+
+
+Compatibility
+-------------
+
+This has been tested on Plone 5.2 with Python 3.6.
 
 
 Support
