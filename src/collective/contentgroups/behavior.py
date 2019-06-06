@@ -20,7 +20,10 @@ class IGroup(model.Schema):
 
     users = schema.Text(
         title=_(u"users_field_title", default=u"Users"),
-        description=_(u"users_field_description", default=u""),
+        description=_(
+            u"users_field_description",
+            default=u"List the ids of users belonging to this group, one per line.",
+        ),
         required=False,
     )
 

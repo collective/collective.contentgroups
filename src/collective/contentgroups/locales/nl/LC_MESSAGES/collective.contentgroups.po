@@ -1,0 +1,44 @@
+# collective.contentgroups translations
+# Maurits van Rees <m.van.rees@zestsoftware.nl>, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: collective.contentgroups 1.0\n"
+"POT-Creation-Date: 2019-06-06 06:41+0000\n"
+"PO-Revision-Date: 2019-06-06 08:41+0200\n"
+"Last-Translator: Maurits van Rees <m.van.rees@zestsoftware.nl>\n"
+"Language-Team: Maurits van Rees <m.van.rees@zestsoftware.nl>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: nl\n"
+"Language-Name: Nederlands\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: collective.contentgroups\n"
+
+#: ./configure.zcml:41
+msgid "Group"
+msgstr "Groep"
+
+#: ./configure.zcml:41
+msgid "Makes the content a group, with users"
+msgstr "Maakt van dit type een groep, met gebruikers"
+
+#: ./configure.zcml:19
+#: ./tests/testing.zcml:11
+msgid "collective.contentgroups"
+msgstr "collective.contentgroups"
+
+#: ./configure.zcml:27
+msgid "collective.contentgroups (uninstall)"
+msgstr "collective.contentgroups (deïnstallatie)"
+
+#. Default: "List the ids of users belonging to this group, one per line."
+#: ./behavior.py:23
+msgid "users_field_description"
+msgstr "Lijst van gebruikers die tot deze groep behoren. Eén per regel."
+
+#. Default: "Users"
+#: ./behavior.py:22
+msgid "users_field_title"
+msgstr "Gebruikers"
