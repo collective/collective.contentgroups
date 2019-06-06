@@ -5,6 +5,7 @@ from collective.contentgroups.utils import list_users
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.dexterity.interfaces import IDexterityContent
 from plone.supermodel import model
+from Products.CMFPlone.utils import base_hasattr
 from six import string_types
 from zope import schema
 from zope.component import adapter
@@ -36,7 +37,13 @@ class Group(object):
 
     @property
     def users(self):
-        return list_users(self.group)
+        # I am tempted to return list_users(self.group),
+        # but then you literally see a list in the view and the edit form.
+        # This would help: "\n".join(list_users(self.group))
+        # But let's simply return what we have.
+        if base_hasattr(self.group, "users"):
+            return self.group.users
+        return ""
 
     @users.setter
     def users(self, value):

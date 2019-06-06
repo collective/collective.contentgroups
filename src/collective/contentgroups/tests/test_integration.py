@@ -21,33 +21,34 @@ class BehaviorTestCase(unittest.TestCase):
 
     def test_igroup(self):
         from collective.contentgroups.behavior import IGroup
+        from collective.contentgroups.utils import list_users
 
         group = self.portal.content1
         adapted = IGroup(group)
         self.assertEqual(
             group.users, "standard_sub_of_content\ncontent1-corey\ngeneral"
         )
-        # The getter returns a sorted list.
+        # The getter returns what we have (not a sorted list like at some point).
         self.assertEqual(
-            adapted.users, ["content1-corey", "general", "standard_sub_of_content"]
+            adapted.users, "standard_sub_of_content\ncontent1-corey\ngeneral"
         )
         # Set it to the same, but with the sorted list as value.
-        adapted.users = adapted.users
+        adapted.users = list_users(adapted.users)
         self.assertEqual(
             group.users, "content1-corey\ngeneral\nstandard_sub_of_content"
         )
         # Set to single string.
         adapted.users = "pete"
         self.assertEqual(group.users, "pete")
-        self.assertEqual(adapted.users, ["pete"])
+        self.assertEqual(adapted.users, "pete")
         # Set to stupid string
         adapted.users = "\n\tfoobar   \n\n\n\r\n  ello  \n\n"
         self.assertEqual(group.users, "ello\nfoobar")
-        self.assertEqual(adapted.users, ["ello", "foobar"])
+        self.assertEqual(adapted.users, "ello\nfoobar")
         # Set to integer, to see that we do not break easily.
         adapted.users = 42
         self.assertEqual(group.users, "42")
-        self.assertEqual(adapted.users, ["42"])
+        self.assertEqual(adapted.users, "42")
 
 
 class IntegrationTestCase(unittest.TestCase):
