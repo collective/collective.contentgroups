@@ -8,6 +8,9 @@ collective.contentgroups
 This is a PAS (``PluggableAuthenticationService``) plugin for Plone.
 It supports content items as groups.
 
+.. image:: https://travis-ci.org/collective/collective.contentgroups.svg?branch=master
+    :target: https://travis-ci.org/collective/collective.contentgroups
+
 
 Features
 --------
