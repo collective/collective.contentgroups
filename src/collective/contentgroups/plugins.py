@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
+from AccessControl.Permissions import manage_users
 from collective.contentgroups.interfaces import IGroupMarker
 from collective.contentgroups.utils import list_users
 from plone import api
@@ -21,7 +22,7 @@ class ContentGroupsPlugin(BasePlugin):
 
     meta_type = "ContentGroups Plugin"
     security = ClassSecurityInfo()
-    security.declareObjectPrivate()
+    security.declareObjectProtected(manage_users)
 
     # Start of IGroupEnumerationPlugin
 
