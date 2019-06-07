@@ -94,8 +94,8 @@ What you *can* do, is:
 Compatibility
 -------------
 
-This works on Plone 5.2 with Python 3.6.
-It probably works with earlier Plone and Python versions too, but this has not been tested.
+This works on Plone 5.2 with Python 2.7 and 3.6.
+It probably works with earlier Plone versions or later Python versions too, but this has not been tested.
 
 
 Support
