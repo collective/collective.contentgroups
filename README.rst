@@ -69,10 +69,14 @@ Adding users
 Adding users to a group *must* be done on the edit form of the content group.
 It *cannot* be done in the Users and Groups control panel.
 In the Users text field, type the ids of users that you want in this group, one per line.
-It is also fine to add a group id in here.
 
 Note: you need the *id* of the user, not the login name.
 Usually they are the same, but they may differ, for example when you use email as login.
+
+It is also fine to add a group id in the users field, either from another content group or a standard Plone Group.
+Such "recursive" group memberships work seemlessly when you use the Plone recursive groups plugin, which is enabled in default Plone.
+For this to work, the ``contentgroups`` PAS plugin needs to be above the ``recursive_groups`` plugin in the ``IGroupsPlugin``.
+The installer takes care of this.
 
 To remove a user from the group, simply remove its id from the Users field.
 
