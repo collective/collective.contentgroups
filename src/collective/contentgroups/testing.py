@@ -110,42 +110,42 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
         ann = api.user.create(
             email="ann@example.org",
             username="casual-ann",
-            password="secret",
+            password="secret123",
             properties={"title": "Ann Casual"},
         )
         api.group.add_user(group=casual, user=ann)
         bert = api.user.create(
             email="bert@example.org",
             username="subcasual-bert",
-            password="secret",
+            password="secret123",
             properties={"title": "Bert Sub Casual"},
         )
         api.group.add_user(group=subcasual, user=bert)
         corey = api.user.create(
             email="corey@example.org",
             username="content1-corey",
-            password="secret",
+            password="secret123",
             properties={"title": "Corey Content 1"},
         )
         content1.users += "\n{0}".format(corey.getUserId())
         donna = api.user.create(
             email="donna@example.org",
             username="content2-donna",
-            password="secret",
+            password="secret123",
             properties={"title": "Donna Content 2"},
         )
         content2.users += "\n{0}".format(donna.getUserId())
         eddy = api.user.create(
             email="eddy@example.org",
             username="sub2a-eddy",
-            password="secret",
+            password="secret123",
             properties={"title": "Eddy Sub 2A"},
         )
         sub2a.users = eddy.getUserId()
         fiona = api.user.create(
             email="fiona@example.org",
             username="sub2b-fiona",
-            password="secret",
+            password="secret123",
             properties={"title": "Fiona Sub 2B"},
         )
         sub2b.users = fiona.getUserId()
@@ -153,7 +153,7 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
         general = api.user.create(
             email="general@example.org",
             username="general",
-            password="secret",
+            password="secret123",
             properties={"title": "General"},
         )
         for group in (casual, subcasual, standard_sub_of_content):
@@ -164,7 +164,7 @@ class ContentGroupsCreatedLayer(ContentGroupsLayer):
         sub = api.user.create(
             email="sub@example.org",
             username="sub",
-            password="secret",
+            password="secret123",
             properties={"title": "Sub"},
         )
         for group in (subcasual, standard_sub_of_content):
