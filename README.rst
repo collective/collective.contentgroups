@@ -8,21 +8,18 @@ collective.contentgroups
 This is a PAS (``PluggableAuthenticationService``) plugin for Plone.
 It supports content items as groups.
 
-.. image:: https://travis-ci.org/collective/collective.contentgroups.svg?branch=master
-    :target: https://travis-ci.org/collective/collective.contentgroups
-
 
 Features
 --------
 
-- A behavior ``collective.contentgroups.group`` that turns a dexterity portal type into a group, with a simple ``users`` text field.
+- A behavior ``collective.contentgroups.group`` that turns a dexterity content type into a group, with a simple ``users`` text field.
 - A PAS plugin ``contentgroups`` that integrates these groups.
 - An adapter ``GroupAdapter`` that gives content items with our behavior the needed functionality that the standard ``PloneGroup`` and ``GroupData`` objects provide.
 - An installer that installs the plugin into ``acl_users``.
 - An uninstaller to remove the plugin.
 
-Note: this package has no Group portal type.
-You will have to enable the behavior yourself on a new or existing dexterity portal type.
+Note: this package has no Group content type.
+You will have to enable the behavior yourself on a new or existing dexterity content type.
 
 
 Installation
@@ -39,6 +36,10 @@ Install collective.contentgroups by adding it to your buildout::
 
 
 and then running ``bin/buildout`` and starting Plone.
+
+Or install it with pip:
+
+    $ bin/pip install collective.contentgroups
 
 Now you can install the product in the Add-ons control panel in Plone.
 Then go to the Dexterity contenttypes control panel.
@@ -101,8 +102,7 @@ What you *can* do, is:
 Compatibility
 -------------
 
-This works on Plone 5.2 with Python 2.7 and 3.6.
-It probably works with earlier Plone versions or later Python versions too, but this has not been tested.
+This is tested on Plone 5.2 with Python 3.8 only, and on Plone 6.0 in Python 3.8-3.11.
 
 
 Support
